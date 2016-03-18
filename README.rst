@@ -2,7 +2,7 @@
  Python Promises
 =====================================================================
 
-:Version: 1.0.0rc1
+:Version: 0.9.1
 :Web: http://vine.readthedocs.org/
 :Download: http://pypi.python.org/pypi/vine/
 :Source: http://github.com/celery/vine/

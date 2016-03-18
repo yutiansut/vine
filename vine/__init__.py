@@ -9,7 +9,7 @@ from .funtools import (
     ppartial, preplace, starpromise, transform, wrap,
 )
 
-VERSION = (0, 9, 0)
+VERSION = (0, 9, 1)
 __version__ = '.'.join(map(str, VERSION[0:3])) + ''.join(VERSION[3:])
 __author__ = 'Ask Solem'
 __contact__ = 'celery@celeryproject.org'
