@@ -1,5 +1,7 @@
 from __future__ import absolute_import, unicode_literals
 
+from weakref import WeakSet
+
 from .abstract import Thenable
 from .promises import promise
 
@@ -35,11 +37,10 @@ class barrier(object):
     def __init__(self, promises=None, args=None, kwargs=None,
                  callback=None, size=None):
         self.p = promise()
-        self.promises = []
         self.args = args or ()
         self.kwargs = kwargs or {}
         self._value = 0
-        self.size = size or len(self.promises)
+        self.size = size or (promises and len(promises)) or 0
         self.ready = self.failed = False
         self.value = self.reason = None
         self.cancelled = False
@@ -71,7 +72,6 @@ class barrier(object):
             if self.ready:
                 raise ValueError('Cannot add promise to full barrier')
             p.then(self)
-            self.promises.append(p)
 
     def add(self, p):
         if not self.cancelled:
