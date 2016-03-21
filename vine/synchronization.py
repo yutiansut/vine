@@ -42,11 +42,11 @@ class barrier(object):
         self._value = 0
         self.size = size or (promises and len(promises)) or 0
         self.ready = self.failed = False
-        self.value = self.reason = None
+        self.reason = None
         self.cancelled = False
         self.finalized = False
 
-        [self.add(p) for p in promises or []]
+        [self.add_noincr(p) for p in promises or []]
         self.finalized = bool(promises or self.size)
         if callback:
             self.then(callback)
