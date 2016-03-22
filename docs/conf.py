@@ -9,7 +9,7 @@ this = os.path.dirname(os.path.abspath(__file__))
 # is relative to the documentation root, use os.path.abspath to make it
 # absolute, like shown here.
 sys.path.append(os.path.join(os.pardir))
-sys.path.append(os.path.join(this, "_ext"))
+sys.path.append(os.path.join(this, '_ext'))
 import vine
 
 # General configuration
@@ -41,7 +41,7 @@ copyright = u'2016, Ask Solem & Contributors'
 # built documents.
 #
 # The short X.Y version.
-version = ".".join(map(str, vine.VERSION[0:2]))
+version = '.'.join(map(str, vine.VERSION[0:2]))
 # The full version, including alpha/beta/rc tags.
 release = vine.__version__
 
@@ -74,8 +74,8 @@ latex_documents = [
      ur'Ask Solem & Contributors', 'manual'),
 ]
 
-html_theme = "celery"
-html_theme_path = ["_theme"]
+html_theme = 'celery'
+html_theme_path = ['_theme']
 html_sidebars = {
     'index': ['sidebarintro.html', 'sourcelink.html', 'searchbox.html'],
     '**': ['sidebarlogo.html', 'relations.html',
@@ -85,8 +85,8 @@ html_sidebars = {
 ### Issuetracker
 
 if False:
-    issuetracker = "github"
-    issuetracker_project = "celery/vine"
+    issuetracker = 'github'
+    issuetracker_project = 'celery/vine'
     issuetracker_issue_pattern = r'[Ii]ssue #(\d+)'
 
 # -- Options for Epub output ------------------------------------------------
