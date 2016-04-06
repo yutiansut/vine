@@ -22,6 +22,7 @@ extensions = [
     'sphinx.ext.pngmath',
     'sphinx.ext.intersphinx',
     'sphinxcontrib.cheeseshop',
+    'githubsphinx',
 ]
 
 html_show_sphinx = False
@@ -84,6 +85,10 @@ html_sidebars = {
     '**': ['sidebarlogo.html', 'relations.html',
            'sourcelink.html', 'searchbox.html'],
 }
+
+# ## Issuetracker
+
+github_project = 'celery/vine'
 
 # -- Options for Epub output ------------------------------------------------
 
