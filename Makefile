@@ -31,7 +31,7 @@ flakediag:
 	-$(MAKE) flakecheck
 
 flakepluscheck:
-	flakeplus vine --2.6
+	flakeplus --2.7 vine
 
 flakeplusdiag:
 	-$(MAKE) flakepluscheck

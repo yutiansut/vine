@@ -1,5 +1,5 @@
 paver
 flake8
-flakeplus
+flakeplus>=1.1
 tox
 Sphinx-PyPI-upload
