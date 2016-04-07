@@ -13,6 +13,7 @@ except ImportError:
     from setuptools.command.test import test              # noqa
 
 import os
+import re
 import sys
 import codecs
 
@@ -40,31 +41,33 @@ classifiers = [s.strip() for s in classes.split('\n') if s]
 
 # -*- Distribution Meta -*-
 
-import re
 re_meta = re.compile(r'__(\w+?)__\s*=\s*(.*)')
-re_vers = re.compile(r'VERSION\s*=\s*\((.*?)\)')
+re_vers = re.compile(r'VERSION\s*=.*?\((.*?)\)')
 re_doc = re.compile(r'^"""(.+?)"""')
-rq = lambda s: s.strip("\"'")
+
+
+def rq(s):
+    return s.strip("\"'")
 
 
 def add_default(m):
     attr_name, attr_value = m.groups()
-    return ((attr_name, rq(attr_value)), )
+    return ((attr_name, rq(attr_value)),)
 
 
 def add_version(m):
     v = list(map(rq, m.groups()[0].split(', ')))
-    return (('VERSION', '.'.join(v[0:3]) + ''.join(v[3:])), )
+    return (('VERSION', '.'.join(v[0:3]) + ''.join(v[3:])),)
 
 
 def add_doc(m):
-    return (('doc', m.groups()[0]), )
+    return (('doc', m.groups()[0]),)
 
 pats = {re_meta: add_default,
         re_vers: add_version,
         re_doc: add_doc}
 here = os.path.abspath(os.path.dirname(__file__))
-with open(os.path.join(here, 'vine/__init__.py')) as meta_fh:
+with open(os.path.join(here, 'vine', '__init__.py')) as meta_fh:
     meta = {}
     for line in meta_fh:
         if line.strip() == '# -eof meta-':
@@ -73,6 +76,7 @@ with open(os.path.join(here, 'vine/__init__.py')) as meta_fh:
             m = pattern.match(line.strip())
             if m:
                 meta.update(handler(m))
+
 
 # -*- Installation Requires -*-
 
