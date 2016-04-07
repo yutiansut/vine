@@ -19,7 +19,7 @@ import vine
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.coverage',
-    'sphinx.ext.pngmath',
+    'sphinx.ext.imgmath',
     'sphinx.ext.viewcode',
     'sphinx.ext.intersphinx',
     'sphinxcontrib.cheeseshop',
@@ -72,6 +72,8 @@ exclude_trees = ['.build']
 add_function_parentheses = True
 
 intersphinx_mapping = {
+    'python': ('http://docs.python.org/dev/', None),
+    'sphinx': ('http://www.sphinx-doc.org/en/stable/', None),
 }
 
 # The name of the Pygments (syntax highlighting) style to use.
