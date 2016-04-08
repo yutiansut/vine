@@ -15,3 +15,4 @@
     vine.funtools
     vine.abstract
     vine.five
+    vine.utils
