@@ -21,4 +21,5 @@ globals().update(conf.build_config(
     html_prepend_sidebars=['sidebardonations.html'],
     extra_extensions=[],
     include_intersphinx={'python', 'sphinx'},
+    apicheck_ignore_modules=['vine'],
 ))

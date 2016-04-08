@@ -18,10 +18,7 @@ htmlclean:
 	-rm -rf "$(SPHINX)"
 
 apicheck:
-	extra/release/doc4allmods vine
-
-indexcheck:
-	extra/release/verify-reference-index.sh
+	(cd $(SPHINX_DIR); $(MAKE) autocheck)
 
 flakecheck:
 	flake8 vine
@@ -64,6 +61,9 @@ gitclean:
 gitcleanforce:
 	git clean -xdf
 
-distcheck: flakecheck apicheck indexcheck readmecheck test gitclean
+tox: removepyc
+	tox
+
+distcheck: flakecheck apicheck readmecheck test gitclean
 
 dist: readme docsclean gitcleanforce removepyc
