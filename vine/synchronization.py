@@ -1,7 +1,5 @@
 from __future__ import absolute_import, unicode_literals
 
-from weakref import WeakSet
-
 from .abstract import Thenable
 from .promises import promise
 
