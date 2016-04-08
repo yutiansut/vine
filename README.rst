@@ -1,5 +1,5 @@
 =====================================================================
- Python Promises
+ vine - Python Promises
 =====================================================================
 
 :Version: 1.0.0
@@ -11,6 +11,4 @@
 About
 =====
 
-.. image:: https://d2weczhvl823v0.cloudfront.net/celery/vine.png
-    :alt: Bitdeli badge
-    :target: https://bitdeli.com/free
+
