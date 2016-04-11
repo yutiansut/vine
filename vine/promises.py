@@ -5,10 +5,12 @@ import sys
 from collections import deque
 
 from .abstract import Thenable
+from .five import python_2_unicode_compatible
 
 __all__ = ['promise']
 
 
+@python_2_unicode_compatible
 class promise(object):
     """Future evaluation.
 
