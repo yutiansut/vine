@@ -4,7 +4,7 @@
 
 |build-status| |coverage| |bitdeli|
 
-.. include:: ../includes/intro.txt
+.. include:: ../includes/introduction.txt
 
 .. |build-status| image:: https://secure.travis-ci.org/celery/vine.png?branch=master
     :alt: Build status

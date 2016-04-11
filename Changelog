@@ -1,6 +1,15 @@
 Changes
 =======
 
+.. _version-1.0.1:
+
+1.0.1
+=====
+:release-date: 2016-04-11 03:00 P.M PDT
+:release-by: Ask Solem
+
+- Adds vine.five.python_2_unicode_compatible.
+
 .. _version-1.0.0:
 
 1.0.0

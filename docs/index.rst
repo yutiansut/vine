@@ -2,7 +2,7 @@
  vine - Python Promises
 =============================================
 
-.. include:: includes/intro.txt
+.. include:: includes/introduction.txt
 
 Contents
 ========

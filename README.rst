@@ -4,7 +4,7 @@
 
 |build-status| |coverage| |bitdeli|
 
-:Version: 1.0.0
+:Version: 1.0.1
 :Web: http://vine.readthedocs.org/
 :Download: http://pypi.python.org/pypi/vine/
 :Source: http://github.com/celery/vine/
