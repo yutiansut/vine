@@ -20,3 +20,9 @@ script: tox -v -- -v
 after_success:
   - .tox/$TRAVIS_PYTHON_VERSION/bin/coverage xml
   - .tox/$TRAVIS_PYTHON_VERSION/bin/codecov -e TOXENV
+notifications:
+  irc:
+    channels:
+      - "chat.freenode.net#celery"
+    on_success: change
+    on_failure: change
