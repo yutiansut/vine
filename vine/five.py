@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-    amqp.five
-    ~~~~~~~~~~~
+    vine.five
+    ~~~~~~~~~
 
     Compatibility implementations of features
     only available in newer Python versions.
@@ -319,4 +319,3 @@ except ImportError:  # Py2
     def getfullargspec(fun, _fill=(None, ) * 3):  # noqa
         s = _getargspec(fun)
         return FullArgSpec(*s + _fill)
-
