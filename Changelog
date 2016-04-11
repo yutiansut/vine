@@ -1,6 +1,18 @@
 Changes
 =======
 
+.. _version-1.0.2:
+
+1.0.2
+=====
+:release-date: TBA
+:release-by: Ask Solem
+
+- ``promise.throw()`` now supports second ``traceback`` argument to
+  throw exception with specific traceback.
+
+    Contributed by Ionel Cristian Mărieș.
+
 .. _version-1.0.1:
 
 1.0.1
