@@ -5,7 +5,7 @@ Changes
 
 1.0.2
 =====
-:release-date: TBA
+:release-date: 2016-04-11 05:30 P.M PDT
 :release-by: Ask Solem
 
 - ``promise.throw()`` now supports second ``traceback`` argument to
