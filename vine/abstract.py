@@ -31,3 +31,9 @@ class Thenable(Callable):  # pragma: no cover
             if any('then' in B.__dict__ for B in C.__mro__):
                 return True
         return NotImplemented
+
+    @classmethod
+    def register(cls, other):
+        # overide to return other so `register` can be used as a decorator
+        type(cls).register(cls, other)
+        return other
