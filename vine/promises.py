@@ -172,12 +172,12 @@ class promise(object):
         self._lvpending.append(callback)
         return callback
 
-    def throw1(self, exc):
-        if self.cancelled:
-            return
-        self.failed, self.reason = True, exc
-        if self.on_error:
-            self.on_error(exc)
+    def throw1(self, exc=None):
+        if not self.cancelled:
+            exc = exc if exc is not None else sys.exc_info()[1]
+            self.failed, self.reason = True, exc
+            if self.on_error:
+                self.on_error(exc)
 
     def throw(self, exc=None, tb=None, propagate=True):
         if not self.cancelled:
