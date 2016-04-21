@@ -103,9 +103,9 @@ class promise(object):
             assert callable(fun)
 
     def __repr__(self):
-        if self.fun:
-            return '<promise@0x{0:x}: {1!r}>'.format(id(self), self.fun)
-        return '<promise@0x{0:x}>'.format(id(self))
+        return ('<{0} --> {1!r}>' if self.fun else '<{0}>').format(
+            '{0}@0x{1:x}'.format(type(self).__name__, id(self)), self.fun,
+        )
 
     def cancel(self):
         self.cancelled = True
