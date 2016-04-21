@@ -179,7 +179,7 @@ class promise(object):
         if self.on_error:
             self.on_error(exc)
 
-    def throw(self, exc=None, tb=None):
+    def throw(self, exc=None, tb=None, propagate=True):
         if not self.cancelled:
             current_exc = sys.exc_info()[1]
             exc = exc if exc is not None else current_exc
@@ -199,7 +199,7 @@ class promise(object):
                     finally:
                         self._lvpending = None
             finally:
-                if self.on_error is None:
+                if self.on_error is None and propagate:
                     if tb is None and (exc is None or exc is current_exc):
                         raise
                     reraise(type(exc), exc, tb)

@@ -18,7 +18,7 @@ class Thenable(Callable):  # pragma: no cover
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def throw(self, exc=None):
+    def throw(self, exc=None, tb=None, propagate=True):
         raise NotImplementedError()
 
     @abc.abstractmethod
