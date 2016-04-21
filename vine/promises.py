@@ -10,6 +10,7 @@ from .five import python_2_unicode_compatible, reraise
 __all__ = ['promise']
 
 
+@Thenable.register
 @python_2_unicode_compatible
 class promise(object):
     """Future evaluation.
@@ -208,5 +209,3 @@ class promise(object):
         if self._lvpending:
             return self._lvpending
         return [self._svpending]
-
-Thenable.register(promise)
