@@ -1,6 +1,57 @@
 Changes
 =======
 
+.. _version-1.1.0:
+
+1.1.0
+=====
+:release-date: 2016-04-21 01:30 P.M PDT
+:release-by: Ask Solem
+
+- :meth:`promise.throw() <vine.promises.promise.throw>` now passes partial
+  args/kwargs to the errback:
+
+    .. code-block:: pycon
+
+        >>> p = promise(args=(self,), on_error=handle_error)
+        >>> p.throw(exc)  # --> handle_error(self, exc)
+
+- New :class:`vine.abstract.ThenableProxy` can be used to add
+  promise-capabilities to a class by forwarding to a different promise.
+
+    .. code-block:: python
+
+        from vine import promise
+        from vine.abstract import ThenableProxy
+
+        class P(ThenableProxy):
+
+            def __init__(self, on_success=None, on_error=None):
+                self._set_promise_target(promise(
+                    args=(self,), callback=on_success, on_error=on_error,
+                ))
+
+        p = P()
+        p.then(download_file(url)).then(extract_file)
+
+- :meth:`promise.throw() <vine.promises.promise.throw>` now supports a propagate
+  argument that can be set to False to never reraise the exception.
+
+- :meth:`promise.throw() <vine.promises.promise.throw>` now also reraises the
+  current exception from the stack, if the exc argument is passed and that
+  value is the same as the current exception.
+
+- :meth:`Thenable.register() <vine.abstract.Thenable.register>` can now be
+  used as a decorator.
+
+- Argument to :meth:`promise.throw1(exc) <vine.promises.promise.throw1>` can now be
+  :const:`None` to use the current exception.
+
+- ``monotonic()`` now uses ``librt.so.0`` as an alternative if ``librt.so.1``
+  does not exist.
+
+    Contributed by Fahad Siddiqui.
+
 .. _version-1.0.2:
 
 1.0.2
