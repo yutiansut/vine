@@ -180,29 +180,29 @@ class promise(object):
             self.on_error(exc)
 
     def throw(self, exc=None, tb=None):
-        if self.cancelled:
-            return
-        _exc = sys.exc_info()[1] if exc is None else exc
-        try:
-            self.throw1(_exc)
-            svpending = self._svpending
-            if svpending is not None:
-                try:
-                    svpending.throw1(_exc)
-                finally:
-                    self._svpending = None
-            else:
-                lvpending = self._lvpending
-                try:
-                    while lvpending:
-                        lvpending.popleft().throw1(_exc)
-                finally:
-                    self._lvpending = None
-        finally:
-            if self.on_error is None:
-                if exc is None:
-                    raise
-                reraise(type(exc), exc, tb)
+        if not self.cancelled:
+            current_exc = sys.exc_info()[1]
+            exc = exc if exc is not None else current_exc
+            try:
+                self.throw1(exc)
+                svpending = self._svpending
+                if svpending is not None:
+                    try:
+                        svpending.throw1(exc)
+                    finally:
+                        self._svpending = None
+                else:
+                    lvpending = self._lvpending
+                    try:
+                        while lvpending:
+                            lvpending.popleft().throw1(exc)
+                    finally:
+                        self._lvpending = None
+            finally:
+                if self.on_error is None:
+                    if tb is None and (exc is None or exc is current_exc):
+                        raise
+                    reraise(type(exc), exc, tb)
 
     @property
     def listeners(self):
