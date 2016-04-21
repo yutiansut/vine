@@ -177,7 +177,7 @@ class promise(object):
             exc = exc if exc is not None else sys.exc_info()[1]
             self.failed, self.reason = True, exc
             if self.on_error:
-                self.on_error(exc)
+                self.on_error(*self.args + (exc,), **self.kwargs)
 
     def throw(self, exc=None, tb=None, propagate=True):
         if not self.cancelled:
