@@ -20,7 +20,7 @@ VERSION = version_info = version_info_t(1, 1, 0, '', '')
 __version__ = '{0.major}.{0.minor}.{0.micro}{0.releaselevel}'.format(VERSION)
 __author__ = 'Ask Solem'
 __contact__ = 'ask@celeryproject.org'
-__homepage__ = 'http://github.com/celery/vine',
+__homepage__ = 'http://github.com/celery/vine'
 __docformat__ = 'restructuredtext'
 
 # -eof meta-
