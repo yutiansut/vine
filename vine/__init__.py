@@ -22,11 +22,11 @@ __docformat__ = 'restructuredtext'
 
 # -eof meta-
 
-# bump version can only search for {current_version}
-# so we have to parse the version.
 version_info_t = namedtuple('version_info_t', (
     'major', 'minor', 'micro', 'releaselevel', 'serial',
 ))
+# bump version can only search for {current_version}
+# so we have to parse the version here.
 _temp = re.match(
     r'(\d+)\.(\d+).(\d+)(.+)?', __version__).groups()
 VERSION = version_info = version_info_t(
