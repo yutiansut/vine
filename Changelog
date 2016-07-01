@@ -1,6 +1,18 @@
 Changes
 =======
 
+.. _version-1.1.1:
+
+1.1.1
+=====
+:release-date: 2016-06-30 12:05 P.M PDT
+:release-by: Ask Solem
+
+- Requirements: Tests now depends on :pypi:`case` 1.2.2
+
+- Five: python_2_unicode_compatible now ensures `__repr__` returns
+  bytes on Python 2.
+
 .. _version-1.1.0:
 
 1.1.0
