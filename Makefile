@@ -1,4 +1,5 @@
 PROJ=vine
+PGPIDENT="Celery Security Team"
 PYTHON=python
 GIT=git
 TOX=tox
@@ -40,6 +41,10 @@ help:
 	@echo "    clean-pyc        - Remove .pyc/__pycache__ files"
 	@echo "    clean-docs       - Remove documentation build artifacts."
 	@echo "    clean-build      - Remove setup artifacts."
+	@echo "bump                 - Bump patch version number"
+	@echo "bump-minor           - Bump minor version number"
+	@echo "bump-major           - Bump major version number"
+	@echo "release              - Make PyPI release"
 
 clean: clean-docs clean-pyc clean-build
 
@@ -48,6 +53,18 @@ clean-dist: clean clean-git-force
 Documentation:
 	(cd "$(SPHINX_DIR)"; $(MAKE) html)
 	mv "$(SPHINX_HTMLDIR)" $(DOCUMENTATION)
+
+bump:
+	bumpversion patch
+
+bump-minor:
+	bumpversion minor
+
+bump-major:
+	bumpversion major
+
+release:
+	python setup.py register sdist bdist_wheel upload --sign --identity=$(PGPIDENT)
 
 docs: Documentation
 
