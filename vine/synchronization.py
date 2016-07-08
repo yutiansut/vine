@@ -38,7 +38,7 @@ class barrier(object):
         self.args = args or ()
         self.kwargs = kwargs or {}
         self._value = 0
-        self.size = size
+        self.size = size or 0
         if not self.size and promises:
             # iter(l) calls len(l) so generator wrappers
             # can only return NotImplemented in the case the
@@ -46,7 +46,6 @@ class barrier(object):
             plen = promises.__len__()
             if plen is not NotImplemented:
                 self.size = plen
-        self.size = size or 0
         self.ready = self.failed = False
         self.reason = None
         self.cancelled = False
