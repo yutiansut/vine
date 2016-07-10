@@ -2,16 +2,15 @@
 
 import re
 
-from collections import namedtuple
+from typing import NamedTuple
 
-from .abstract import Thenable
-from .promises import promise
-from .synchronization import barrier
 from .funtools import (
     maybe_promise, ensure_promise,
     ppartial, preplace, starpromise, transform, wrap,
 )
-
+from .promises import promise
+from .synchronization import barrier
+from .types import Thenable
 
 __version__ = '1.1.1'
 __author__ = 'Ask Solem'
@@ -21,9 +20,13 @@ __docformat__ = 'restructuredtext'
 
 # -eof meta-
 
-version_info_t = namedtuple('version_info_t', (
-    'major', 'minor', 'micro', 'releaselevel', 'serial',
-))
+version_info_t = NamedTuple('version_info_t', [
+    ('major', int),
+    ('minor', int),
+    ('micro', int),
+    ('releaselevel', str),
+    ('serial', str),
+])
 # bump version can only search for {current_version}
 # so we have to parse the version here.
 _temp = re.match(

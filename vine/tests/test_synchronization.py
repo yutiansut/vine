@@ -1,4 +1,3 @@
-
 from vine.promises import promise
 from vine.synchronization import barrier
 
@@ -7,11 +6,11 @@ from .case import Case, Mock
 
 class test_barrier(Case):
 
-    def setup(self):
+    def setup(self) -> None:
         self.m1, self.m2, self.m3 = Mock(), Mock(), Mock()
         self.ps = [promise(self.m1), promise(self.m2), promise(self.m3)]
 
-    def test_evaluate(self):
+    def test_evaluate(self) -> None:
         x = barrier(self.ps)
         x()
         self.assertFalse(x.ready)
@@ -28,7 +27,7 @@ class test_barrier(Case):
         with self.assertRaises(ValueError):
             x.add(promise())
 
-    def test_reverse(self):
+    def test_reverse(self) -> None:
         callback = Mock()
         x = barrier(self.ps, callback=promise(callback))
         for p in self.ps:
@@ -36,7 +35,7 @@ class test_barrier(Case):
         self.assertTrue(x.ready)
         callback.assert_called_with()
 
-    def test_cancel(self):
+    def test_cancel(self) -> None:
         x = barrier(self.ps)
         x.cancel()
         for p in self.ps:
@@ -45,7 +44,7 @@ class test_barrier(Case):
         x.throw(KeyError())
         self.assertFalse(x.ready)
 
-    def test_throw(self):
+    def test_throw(self) -> None:
         x = barrier(self.ps)
         with self.assertRaises(KeyError):
             x.throw(KeyError(10))

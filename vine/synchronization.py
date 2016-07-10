@@ -1,10 +1,13 @@
-from .abstract import Thenable
+from typing import Dict, Optional, Sequence, Tuple
+
 from .promises import promise
+from .types import PromiseArg, Thenable, ThenableProxy
 
 __all__ = ['barrier']
 
 
-class barrier:
+@Thenable.register
+class barrier(ThenableProxy):
     """Synchronization primitive to call a callback after a list
     of promises have been fulfilled.
 
@@ -28,15 +31,22 @@ class barrier:
 
     Note that you cannot add new promises to a barrier after
     the barrier is fulfilled.
-
     """
-    def __init__(self, promises=None, args=None, kwargs=None,
-                 callback=None, size=None):
-        self.p = promise()
-        self.args = args or ()
-        self.kwargs = kwargs or {}
-        self._value = 0
-        self.size = size or 0
+
+    def __init__(self, promises: Optional[Sequence[Thenable]] = None,
+                 args: Optional[Tuple] = None,
+                 kwargs: Optional[Dict] = None,
+                 callback: Optional[PromiseArg] = None,
+                 size: Optional[int] = None) -> None:
+        self._set_promise_target(promise())
+        self.args = args or ()      # type: Tuple
+        self.kwargs = kwargs or {}  # type: Dict
+        self._value = 0             # type: int
+        self.size = size or 0       # type: int
+        self.ready = False          # type: bool
+        self.failed = False         # type: bool
+        self.cancelled = False      # type: bool
+        self.finalized = False      # type: bool
         if not self.size and promises:
             # iter(l) calls len(l) so generator wrappers
             # can only return NotImplemented in the case the
@@ -44,48 +54,50 @@ class barrier:
             plen = promises.__len__()
             if plen is not NotImplemented:
                 self.size = plen
-        self.ready = self.failed = False
-        self.reason = None
-        self.cancelled = False
-        self.finalized = False
 
-        [self.add_noincr(p) for p in promises or []]
+        if promises:
+            self.extend_noincr(promises)
         self.finalized = bool(promises or self.size)
         if callback:
             self.then(callback)
 
-    def __call__(self, *args, **kwargs):
+    def __call__(self, *args, **kwargs) -> None:
         if not self.ready and not self.cancelled:
             self._value += 1
             if self.finalized and self._value >= self.size:
                 self.ready = True
                 self.p(*self.args, **self.kwargs)
 
-    def finalize(self):
+    def finalize(self) -> None:
         if not self.finalized and self._value >= self.size:
             self.p(*self.args, **self.kwargs)
         self.finalized = True
 
-    def cancel(self):
-        self.cancelled = True
-        self.p.cancel()
-
-    def add_noincr(self, p):
-        if not self.cancelled:
-            if self.ready:
-                raise ValueError('Cannot add promise to full barrier')
-            p.then(self)
-
-    def add(self, p):
+    def add(self, p: Thenable) -> None:
         if not self.cancelled:
             self.add_noincr(p)
             self.size += 1
 
-    def then(self, callback, errback=None):
-        self.p.then(callback, errback)
-
-    def throw(self, *args, **kwargs):
+    def add_noincr(self, p: Thenable) -> Thenable:
         if not self.cancelled:
-            self.p.throw(*args, **kwargs)
-    throw1 = throw
-Thenable.register(barrier)
+            if self.ready:
+                raise ValueError('Cannot add promise to full barrier')
+            p.then(self)
+        return p
+
+    def extend(self, promises: Sequence[Thenable]) -> None:
+        if not self.cancelled:
+            self.size += len(promises)
+            self.extend_noincr(promises)
+
+    def extend_noincr(self, promises: Sequence[Thenable]) -> None:
+        if not self.cancelled:
+            [self.add_noincr(p) for p in promises]
+
+    @property
+    def p(self) -> Thenable:
+        return self._p
+
+    @p.setter
+    def p(self, p: Thenable) -> None:
+        self._p = p

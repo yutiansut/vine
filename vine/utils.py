@@ -1,32 +1,23 @@
 import io
 
-from functools import (
-    WRAPPER_ASSIGNMENTS, WRAPPER_UPDATES,
-    update_wrapper as _update_wrapper,
-    partial,
-)
+# Python 3.6 sets wrapper.__wrapped__ now, so no longer
+# necessary to import wraps from this module.
+from functools import update_wrapper, wraps  # noqa
+from typing import AnyStr, Callable, cast
 
 __all__ = ['AnyStringIO', 'update_wrapper', 'wraps']
 
 
+def want_str(s: AnyStr) -> str:
+    return cast(bytes, s).decode() if isinstance(s, bytes) else cast(str, s)
+
+
 class AnyStringIO(io.StringIO):
 
-    def __init__(self, v=None, *a, _init=io.StringIO.__init__, **kw):
-        _init(self, v.decode() if isinstance(v, bytes) else v, *a, **kw)
+    def __init__(self, s: AnyStr = None,
+                 *a, _init: Callable = io.StringIO.__init__, **kw) -> None:
+        _init(self, want_str(s), *a, **kw)
 
-    def write(self, data, _write=io.StringIO.write):
-        _write(self, data.decode() if isinstance(data, bytes) else data)
-
-
-
-def update_wrapper(wrapper, wrapped, *args, **kwargs):
-    wrapper = _update_wrapper(wrapper, wrapped, *args, **kwargs)
-    wrapper.__wrapped__ = wrapped
-    return wrapper
-
-
-def wraps(wrapped,
-          assigned=WRAPPER_ASSIGNMENTS,
-          updated=WRAPPER_UPDATES):
-    return partial(update_wrapper, wrapped=wrapped,
-                   assigned=assigned, updated=updated)
+    def write(self, s: AnyStr,
+              _write: Callable = io.StringIO.write) -> int:
+        return _write(self, want_str(s))

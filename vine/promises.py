@@ -1,8 +1,13 @@
 import sys
 
 from collections import deque
+from reprlib import recursive_repr
+from types import TracebackType
+from typing import (
+    Any, Callable, Dict, MutableSequence, Optional, Sequence, cast,
+)
 
-from .abstract import Thenable
+from .types import Thenable
 
 __all__ = ['promise']
 
@@ -78,18 +83,21 @@ class promise:
             'on_error', 'cancelled',
         )
 
-    def __init__(self, fun=None, args=None, kwargs=None,
-                 callback=None, on_error=None):
+    def __init__(self, fun: Optional[Callable] = None,
+                 args: Optional[Sequence] = None,
+                 kwargs: Optional[Dict] = None,
+                 callback: Optional[Callable] = None,
+                 on_error: Optional[Callable] = None) -> None:
         self.fun = fun
-        self.args = args or ()
+        self.args = cast(Sequence, args or ())  # type: Sequence
         self.kwargs = kwargs or {}
         self.ready = False
         self.failed = False
-        self.value = None
-        self.reason = None
-        self._svpending = None
-        self._lvpending = None
-        self.on_error = on_error
+        self.value = None        # type: Any
+        self.reason = None       # type: Optional[BaseException]
+        self._svpending = None   # type: Thenable
+        self._lvpending = None   # type: deque[Thenable]
+        self.on_error = cast(Thenable, on_error)
         self.cancelled = False
 
         if callback is not None:
@@ -98,12 +106,7 @@ class promise:
         if self.fun:
             assert callable(fun)
 
-    def __repr__(self):
-        return ('<{0} --> {1!r}>' if self.fun else '<{0}>').format(
-            '{0}@0x{1:x}'.format(type(self).__name__, id(self)), self.fun,
-        )
-
-    def cancel(self):
+    def cancel(self) -> None:
         self.cancelled = True
         try:
             if self._svpending is not None:
@@ -116,16 +119,22 @@ class promise:
         finally:
             self._svpending = self._lvpending = self.on_error = None
 
-    def __call__(self, *args, **kwargs):
-        retval = None
+    def __call__(self, *args, **kwargs) -> Any:
         if self.cancelled:
             return
-        final_args = self.args + args if args else self.args
-        final_kwargs = dict(self.kwargs, **kwargs) if kwargs else self.kwargs
+        ca = ()  # type: Sequence
+        ck = {}  # type: Dict
+        retval = None  # type: Any
+        final_args = (self.args + cast(MutableSequence, args) if args
+                      else self.args)  # type: Sequence
+        final_kwargs = (dict(self.kwargs, **kwargs) if kwargs
+                        else self.kwargs)  # type: Dict
         if self.fun:
             try:
                 retval = self.fun(*final_args, **final_kwargs)
-                self.value = (ca, ck) = (retval,), {}
+                ca = (retval,)
+                ck = {}
+                self.value = (ca, ck)
             except Exception:
                 return self.throw()
             except BaseException:
@@ -134,7 +143,9 @@ class promise:
                     raise
                 return self.throw()
         else:
-            self.value = (ca, ck) = final_args, final_kwargs
+            ca = final_args
+            ck = final_kwargs
+            self.value = (ca, ck)
         self.ready = True
         svpending = self._svpending
         if svpending is not None:
@@ -152,35 +163,39 @@ class promise:
                 self._lvpending = None
         return retval
 
-    def then(self, callback, on_error=None):
-        if not isinstance(callback, Thenable):
-            callback = promise(callback, on_error=on_error)
+    def then(self, callback: Callable,
+             on_error: Optional[Callable] = None) -> Thenable:
+        p = cast(Thenable, callback)
+        if isinstance(p, Thenable):
+            p = promise(callback, on_error=on_error)
         if self.cancelled:
-            callback.cancel()
-            return callback
+            p.cancel()
+            return p
         if self.failed:
-            callback.throw(self.reason)
+            p.throw(self.reason)
         elif self.ready:
             args, kwargs = self.value
-            callback(*args, **kwargs)
+            p(*args, **kwargs)
         if self._lvpending is None:
             svpending = self._svpending
             if svpending is not None:
                 self._svpending, self._lvpending = None, deque([svpending])
             else:
-                self._svpending = callback
-                return callback
-        self._lvpending.append(callback)
-        return callback
+                self._svpending = p
+                return p
+        self._lvpending.append(p)
+        return p
 
-    def throw1(self, exc=None):
+    def throw1(self, exc: Optional[BaseException] = None) -> None:
         if not self.cancelled:
             exc = exc if exc is not None else sys.exc_info()[1]
             self.failed, self.reason = True, exc
             if self.on_error:
                 self.on_error(*self.args + (exc,), **self.kwargs)
 
-    def throw(self, exc=None, tb=None, propagate=True):
+    def throw(self, exc: Optional[BaseException] = None,
+              tb: Optional[TracebackType] = None,
+              propagate: int = True) -> None:
         if not self.cancelled:
             current_exc = sys.exc_info()[1]
             exc = exc if exc is not None else current_exc
@@ -205,8 +220,14 @@ class promise:
                         raise
                     raise exc.with_traceback(tb)
 
+    def __repr__(self) -> str:
+        return ('<{0} --> {1!r}>' if self.fun else '<{0}>').format(
+            '{0}@0x{1:x}'.format(
+                type(self).__qualname__, id(self)), self.fun,
+        )
+
     @property
-    def listeners(self):
+    def listeners(self) -> MutableSequence:
         if self._lvpending:
             return self._lvpending
         return [self._svpending]

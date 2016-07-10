@@ -1,22 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-try:
-    from setuptools import setup, find_packages
-    from setuptools.command.test import test
-except ImportError:
-    raise
-    from ez_setup import use_setuptools
-    use_setuptools()
-    from setuptools import setup, find_packages           # noqa
-    from setuptools.command.test import test              # noqa
+from setuptools import setup, find_packages
 
-import os
 import re
 import sys
 import codecs
 
 if sys.version_info < (3, 6):
     raise Exception('vine 2.x requires Python 3.6 or higher.')
+
+from pathlib import Path  # noqa
 
 NAME = 'vine'
 entrypoints = {}
@@ -51,8 +44,8 @@ def add_doc(m):
 
 pats = {re_meta: add_default,
         re_doc: add_doc}
-here = os.path.abspath(os.path.dirname(__file__))
-with open(os.path.join(here, 'vine', '__init__.py')) as meta_fh:
+here = Path(__file__).parent.absolute()
+with open(here / 'vine' / '__init__.py') as meta_fh:
     meta = {}
     for line in meta_fh:
         if line.strip() == '# -eof meta-':
@@ -75,8 +68,8 @@ def strip_comments(l):
 
 
 def reqs(f):
-    return filter(None, [strip_comments(l) for l in open(
-        os.path.join(os.getcwd(), 'requirements', f)).readlines()])
+    return list(filter(None, [strip_comments(l) for l in open(
+        Path.cwd() / 'requirements' / f).readlines()]))
 
 install_requires = []
 
@@ -86,7 +79,7 @@ tests_require = reqs('test.txt')
 
 # -*- Long Description -*-
 
-if os.path.exists('README.rst'):
+if Path('README.rst').exists():
     long_description = codecs.open('README.rst', 'r', 'utf-8').read()
 else:
     long_description = 'See http://pypi.python.org/pypi/vine'

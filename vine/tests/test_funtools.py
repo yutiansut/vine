@@ -1,17 +1,18 @@
+from typing import Callable, Dict
 
-from vine.abstract import Thenable
 from vine.funtools import (
     maybe_promise, ppartial, preplace,
     ready_promise, starpromise, transform, wrap,
 )
 from vine.promises import promise
+from vine.types import Thenable
 
 from .case import Case, Mock
 
 
 class test_wrap(Case):
 
-    def test_wrap(self):
+    def test_wrap(self) -> None:
         cb1 = Mock()
         cb2 = Mock()
         x = wrap(promise(cb1))
@@ -25,10 +26,11 @@ class test_wrap(Case):
 
 class test_transform(Case):
 
-    def test_transform(self):
+    def test_transform(self) -> None:
         callback = Mock()
 
-        def filter_key_value(key, filter_, mapping):
+        def filter_key_value(key: str,
+                             filter_: Callable, mapping: Dict) -> int:
             return filter_(mapping[key])
 
         x = transform(filter_key_value, promise(callback), 'Value', int)
@@ -41,14 +43,14 @@ class test_transform(Case):
 
 class test_maybe_promise(Case):
 
-    def test_when_none(self):
+    def test_when_none(self) -> None:
         self.assertIsNone(maybe_promise(None))
 
-    def test_when_promise(self):
+    def test_when_promise(self) -> None:
         p = promise()
         self.assertIs(maybe_promise(p), p)
 
-    def test_when_other(self):
+    def test_when_other(self) -> None:
         m = Mock()
         p = maybe_promise(m)
         self.assertIsInstance(p, Thenable)
@@ -56,7 +58,7 @@ class test_maybe_promise(Case):
 
 class test_starpromise(Case):
 
-    def test_apply(self):
+    def test_apply(self) -> None:
         m = Mock()
         p = starpromise(m, 1, 2, z=3)
         p()
@@ -65,7 +67,7 @@ class test_starpromise(Case):
 
 class test_ready_promise(Case):
 
-    def test_apply(self):
+    def test_apply(self) -> None:
         m = Mock()
         p = ready_promise(m, 1, 2, 3)
         m.assert_called_with(1, 2, 3)
@@ -74,7 +76,7 @@ class test_ready_promise(Case):
 
 class test_ppartial(Case):
 
-    def test_apply(self):
+    def test_apply(self) -> None:
         m = Mock()
         p = ppartial(m, 1)
         p()
@@ -86,7 +88,7 @@ class test_ppartial(Case):
 
 class test_preplace(Case):
 
-    def test_preplace(self):
+    def test_preplace(self) -> None:
         m = Mock()
         p = promise(m)
         p2 = preplace(p, 1, 2, z=3)

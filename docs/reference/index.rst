@@ -13,6 +13,6 @@
     vine.promises
     vine.synchronization
     vine.funtools
-    vine.abstract
+    vine.types
     vine.five
     vine.utils

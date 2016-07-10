@@ -1,6 +1,7 @@
+from typing import Any, Callable, Dict, Optional, Tuple, cast
 
-from .abstract import Thenable
 from .promises import promise
+from .types import Thenable
 
 __all__ = [
     'maybe_promise', 'ensure_promise',
@@ -9,46 +10,47 @@ __all__ = [
 ]
 
 
-def maybe_promise(p):
-    if p:
-        if not isinstance(p, Thenable):
-            return promise(p)
+def maybe_promise(p: Optional[Callable]) -> Optional[Thenable]:
+    p = cast(Thenable, p)
+    if p and not isinstance(p, Thenable):
+        return promise(p)
     return p
 
 
-def ensure_promise(p):
+def ensure_promise(p: Optional[Callable]) -> Thenable:
     if p is None:
         return promise()
-    return maybe_promise(p)
+    return cast(Thenable, maybe_promise(p))
 
 
-def ppartial(p, *args, **kwargs):
-    p = ensure_promise(p)
+def ppartial(p: Optional[Callable], *args, **kwargs) -> Thenable:
+    _p = ensure_promise(p)
     if args:
-        p.args = args + p.args
+        _p.args = args + _p.args
     if kwargs:
-        p.kwargs.update(kwargs)
-    return p
+        _p.kwargs.update(kwargs)
+    return _p
 
 
-def preplace(p, *args, **kwargs):
+def preplace(p: Thenable, *args, **kwargs) -> Thenable:
 
-    def _replacer(*_, **__):
+    def _replacer(*_, **__) -> Any:
         return p(*args, **kwargs)
     return promise(_replacer)
 
 
-def ready_promise(callback=None, *args):
+def ready_promise(callback: Optional[Callable] = None, *args) -> Any:
     p = ensure_promise(callback)
     p(*args)
     return p
 
 
-def starpromise(fun, *args, **kwargs):
+def starpromise(fun: Callable, *args, **kwargs) -> Thenable:
     return promise(fun, args, kwargs)
 
 
-def transform(filter_, callback, *filter_args, **filter_kwargs):
+def transform(filter_: Callable, callback: Callable,
+              *filter_args, **filter_kwargs) -> Thenable:
     """Filter final argument to a promise.
 
     E.g. to coerce callback argument to :class:`int`::
@@ -70,13 +72,14 @@ def transform(filter_, callback, *filter_args, **filter_kwargs):
             )
 
     """
-    callback = ensure_promise(callback)
-    P = promise(_transback, (filter_, callback, filter_args, filter_kwargs))
-    P.then(promise(), callback.throw)
+    pcallback = ensure_promise(callback)
+    P = promise(_transback, (filter_, pcallback, filter_args, filter_kwargs))
+    P.then(promise(), pcallback.throw)
     return P
 
 
-def _transback(filter_, callback, args, kwargs, ret):
+def _transback(filter_: Callable, callback: Thenable,
+               args: Tuple, kwargs: Dict, ret: Any) -> Any:
     try:
         ret = filter_(*args + (ret,), **kwargs)
     except Exception:
@@ -85,11 +88,11 @@ def _transback(filter_, callback, args, kwargs, ret):
         return callback(ret)
 
 
-def wrap(p):
+def wrap(p: Thenable):
     """Wrap promise so that if the promise is called with a promise as
     argument, we attach ourselves to that promise instead."""
 
-    def on_call(*args, **kwargs):
+    def on_call(*args, **kwargs) -> Any:
         if len(args) == 1 and isinstance(args[0], promise):
             return args[0].then(p)
         else:

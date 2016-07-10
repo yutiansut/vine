@@ -1,11 +1,11 @@
 =====================================================
- vine.abstract
+ vine.types
 =====================================================
 
 .. contents::
     :local:
-.. currentmodule:: vine.abstract
+.. currentmodule:: vine.types
 
-.. automodule:: vine.abstract
+.. automodule:: vine.types
     :members:
     :undoc-members:

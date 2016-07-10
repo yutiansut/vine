@@ -1,6 +1,8 @@
 import traceback
+
 from collections import deque
 from struct import pack, unpack
+from typing import Callable, Optional
 
 import sys
 
@@ -12,28 +14,31 @@ from .case import Case, Mock
 
 class test_promise(Case):
 
-    def test_example(self):
+    def test_example(self) -> None:
 
         _pending = deque()
 
         class Protocol:
 
-            def __init__(self):
+            def __init__(self) -> None:
                 self.buffer = []
 
-            def read(self, size, callback=None):
+            def read(self, size: int,
+                     callback: Optional[Callable] = None) -> Callable:
                 callback = callback or promise()
                 _pending.append((size, callback))
                 return callback
 
-            def read_header(self, callback=None):
+            def read_header(self,
+                            callback: Optional[Callable] = None) -> Callable:
                 return self.read(4, callback)
 
-            def read_body(self, header, callback=None):
+            def read_body(self, header: bytes,
+                          callback: Optional[Callable] = None) -> Callable:
                 body_size, = unpack('>L', header)
                 return self.read(body_size, callback)
 
-            def prepare_body(self, value):
+            def prepare_body(self, value: str) -> None:
                 self.buffer.append(value)
 
         proto = Protocol()
@@ -50,19 +55,19 @@ class test_promise(Case):
         self.assertTrue(proto.buffer)
         self.assertEqual(proto.buffer[0], 'Hello world')
 
-    def test_signal(self):
+    def test_signal(self) -> None:
         callback = Mock(name='callback')
         a = promise()
         a.then(callback)
         a(42)
         callback.assert_called_with(42)
 
-    def test_chained(self):
+    def test_chained(self) -> None:
 
-        def add(x, y):
+        def add(x: int, y: int) -> int:
             return x + y
 
-        def pow2(x):
+        def pow2(x: int) -> int:
             return x ** 2
 
         adder = Mock(name='adder')
@@ -82,7 +87,7 @@ class test_promise(Case):
         power.assert_called_with(84)
         final.assert_called_with(7056)
 
-    def test_shallow_filter(self):
+    def test_shallow_filter(self) -> None:
         a, b = promise(Mock(name='a')), promise(Mock(name='b'))
         p = promise(a, callback=b)
         self.assertIsNotNone(p._svpending)
@@ -97,7 +102,7 @@ class test_promise(Case):
         c.assert_called_with(1)
         d.assert_called_with(c.return_value)
 
-    def test_deep_filter(self):
+    def test_deep_filter(self) -> None:
         a = promise(Mock(name='a'))
         b1, b2, b3 = (
             promise(Mock(name='a1')),
@@ -119,7 +124,7 @@ class test_promise(Case):
         b2.fun.assert_called_with(a.fun.return_value)
         b3.fun.assert_called_with(a.fun.return_value)
 
-    def test_chained_filter(self):
+    def test_chained_filter(self) -> None:
         a = promise(Mock(name='a'))
         b = promise(Mock(name='b'))
         c = promise(Mock(name='c'))
@@ -135,11 +140,11 @@ class test_promise(Case):
         c.fun.assert_called_with(b.fun.return_value)
         d.fun.assert_called_with(c.fun.return_value)
 
-    def test_repr(self):
+    def test_repr(self) -> None:
         self.assertTrue(repr(promise()))
         self.assertTrue(repr(promise(Mock())))
 
-    def test_cancel(self):
+    def test_cancel(self) -> None:
         on_error = promise(Mock(name='on_error'))
         p = promise(on_error=on_error)
         a, b, c = (
@@ -163,7 +168,7 @@ class test_promise(Case):
         p.then(d)
         self.assertTrue(d.cancelled)
 
-    def test_svpending_raises(self):
+    def test_svpending_raises(self) -> None:
         p = promise()
         a_on_error = promise(Mock(name='a_on_error'))
         a = promise(Mock(name='a'), on_error=a_on_error)
@@ -174,26 +179,26 @@ class test_promise(Case):
         p(42)
         a_on_error.fun.assert_called_with(exc)
 
-    def test_empty_promise(self):
+    def test_empty_promise(self) -> None:
         p = promise()
         p(42)
         x = Mock(name='x')
         p.then(x)
         x.assert_called_with(42)
 
-    def test_with_partial_args(self):
+    def test_with_partial_args(self) -> None:
         m = Mock(name='m')
         p = promise(m, (1, 2, 3), {'foobar': 2})
         p()
         m.assert_called_with(1, 2, 3, foobar=2)
 
-    def test_with_partial_args_and_args(self):
+    def test_with_partial_args_and_args(self) -> None:
         m = Mock(name='m')
         p = promise(m, (1, 2, 3), {'foobar': 2})
         p(4, 5, bazbar=3)
         m.assert_called_with(1, 2, 3, 4, 5, foobar=2, bazbar=3)
 
-    def test_lvpending_raises(self):
+    def test_lvpending_raises(self) -> None:
         p = promise()
         a_on_error = promise(Mock(name='a_on_error'))
         a = promise(Mock(name='a'), on_error=a_on_error)
@@ -212,7 +217,7 @@ class test_promise(Case):
         a_on_error.fun.assert_called_with(exc)
         b.fun.assert_called_with(42)
 
-    def test_cancel_sv(self):
+    def test_cancel_sv(self) -> None:
         p = promise()
         a = promise(Mock(name='a'))
         p.then(a)
@@ -223,27 +228,27 @@ class test_promise(Case):
         p.throw(KeyError())
         p.throw1(KeyError())
 
-    def test_cancel_no_cb(self):
+    def test_cancel_no_cb(self) -> None:
         p = promise()
         p.cancel()
         self.assertTrue(p.cancelled)
         self.assertEqual(p.on_error, None)
         p.throw(KeyError())
 
-    def test_throw_no_exc(self):
+    def test_throw_no_exc(self) -> None:
         p = promise()
         with self.assertRaises((TypeError, RuntimeError)):
             p.throw()
 
-    def test_throw_no_excinfo(self):
+    def test_throw_no_excinfo(self) -> None:
         p = promise()
         with self.assertRaises(KeyError):
             p.throw(KeyError())
 
-    def test_throw_with_tb(self):
+    def test_throw_with_tb(self) -> None:
         p = promise()
 
-        def foo():
+        def foo() -> None:
             raise KeyError()
 
         try:
@@ -257,13 +262,13 @@ class test_promise(Case):
             else:
                 raise AssertionError("Did not throw.")
 
-    def test_throw_with_other_tb(self):
+    def test_throw_with_other_tb(self) -> None:
         p = promise()
 
-        def foo():
+        def foo() -> None:
             raise KeyError()
 
-        def bar():
+        def bar() -> None:
             raise ValueError()
 
         try:
@@ -282,21 +287,21 @@ class test_promise(Case):
             else:
                 raise AssertionError("Did not throw.")
 
-    def test_throw_None(self):
+    def test_throw_None(self) -> None:
         try:
             raise KeyError()
         except Exception:
             with self.assertRaises(KeyError):
                 promise().throw()
 
-    def test_listeners(self):
+    def test_listeners(self) -> None:
         p = promise()
         p.then(Mock())
         self.assertEqual(len(p.listeners), 1)
         p.then(Mock())
         self.assertEqual(len(p.listeners), 2)
 
-    def test_throw_from_cb(self):
+    def test_throw_from_cb(self) -> None:
         ae = promise(Mock(name='ae'))
         a = Mock(name='a')
         be = promise(Mock(name='be'))
