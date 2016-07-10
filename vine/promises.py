@@ -128,6 +128,11 @@ class promise:
                 self.value = (ca, ck) = (retval,), {}
             except Exception:
                 return self.throw()
+            except BaseException:
+                # reraise SystemExit and friends in context of promise.
+                if self.cancelled:
+                    raise
+                return self.throw()
         else:
             self.value = (ca, ck) = final_args, final_kwargs
         self.ready = True
