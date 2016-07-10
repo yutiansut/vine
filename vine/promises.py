@@ -11,7 +11,7 @@ __all__ = ['promise']
 
 @Thenable.register
 @python_2_unicode_compatible
-class promise(object):
+class promise:
     """Future evaluation.
 
     This is a special implementation of promises in that it can
@@ -48,7 +48,7 @@ class promise(object):
 
         from vine import promise, wrap
 
-        class Protocol(object):
+        class Protocol:
 
             def __init__(self):
                 self.buffer = []

@@ -31,15 +31,9 @@ class Thenable(Callable):  # pragma: no cover
                 return True
         return NotImplemented
 
-    @classmethod
-    def register(cls, other):
-        # overide to return other so `register` can be used as a decorator
-        type(cls).register(cls, other)
-        return other
-
 
 @Thenable.register
-class ThenableProxy(object):
+class ThenableProxy:
 
     def _set_promise_target(self, p):
         self._p = p

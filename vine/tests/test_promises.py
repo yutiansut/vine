@@ -1,4 +1,3 @@
-
 import traceback
 from collections import deque
 from struct import pack, unpack
@@ -17,7 +16,7 @@ class test_promise(Case):
 
         _pending = deque()
 
-        class Protocol(object):
+        class Protocol:
 
             def __init__(self):
                 self.buffer = []

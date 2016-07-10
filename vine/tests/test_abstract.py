@@ -5,13 +5,13 @@ from vine.promises import promise
 from .case import Case
 
 
-class CanThen(object):
+class CanThen:
 
     def then(self, x, y):
         pass
 
 
-class CannotThen(object):
+class CannotThen:
     pass
 
 

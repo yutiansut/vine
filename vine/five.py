@@ -26,8 +26,7 @@ try:
 except NameError:  # pragma: no cover
     # Py3 does not have buffer, only use this for isa checks.
 
-    class buffer_t(object):  # noqa
-        pass
+    class buffer_t: ... # noqa
 
 bytes_t = bytes
 

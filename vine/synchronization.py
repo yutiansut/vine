@@ -1,11 +1,10 @@
-
 from .abstract import Thenable
 from .promises import promise
 
 __all__ = ['barrier']
 
 
-class barrier(object):
+class barrier:
     """Synchronization primitive to call a callback after a list
     of promises have been fulfilled.
 
