@@ -1,3 +1,4 @@
+import io
 
 from functools import (
     WRAPPER_ASSIGNMENTS, WRAPPER_UPDATES,
@@ -5,7 +6,17 @@ from functools import (
     partial,
 )
 
-__all__ = ['update_wrapper', 'wraps']
+__all__ = ['AnyStringIO', 'update_wrapper', 'wraps']
+
+
+class AnyStringIO(io.StringIO):
+
+    def __init__(self, v=None, *a, _init=io.StringIO.__init__, **kw):
+        _init(self, v.decode() if isinstance(v, bytes) else v, *a, **kw)
+
+    def write(self, data, _write=io.StringIO.write):
+        _write(self, data.decode() if isinstance(data, bytes) else data)
+
 
 
 def update_wrapper(wrapper, wrapped, *args, **kwargs):

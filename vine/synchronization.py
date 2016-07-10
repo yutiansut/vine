@@ -19,7 +19,7 @@ class barrier:
         requests = [p1, p2, p3]
 
         def all_done():
-            pass  # all requests complete
+            ...  # all requests complete
 
         b = barrier(requests).then(all_done)
 

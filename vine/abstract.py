@@ -3,26 +3,23 @@ import abc
 
 from collections import Callable
 
-from .five import with_metaclass
-
 __all__ = ['Thenable']
 
 
-@with_metaclass(abc.ABCMeta)
-class Thenable(Callable):  # pragma: no cover
+class Thenable(Callable, metaclass=abc.ABCMeta):  # pragma: no cover
     __slots__ = ()
 
     @abc.abstractmethod
     def then(self, on_success, on_error=None):
-        raise NotImplementedError()
+        ...
 
     @abc.abstractmethod
     def throw(self, exc=None, tb=None, propagate=True):
-        raise NotImplementedError()
+        ...
 
     @abc.abstractmethod
     def cancel(self):
-        raise NotImplementedError()
+        ...
 
     @classmethod
     def __subclasshook__(cls, C):

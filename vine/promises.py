@@ -1,16 +1,13 @@
-
 import sys
 
 from collections import deque
 
 from .abstract import Thenable
-from .five import python_2_unicode_compatible, reraise
 
 __all__ = ['promise']
 
 
 @Thenable.register
-@python_2_unicode_compatible
 class promise:
     """Future evaluation.
 
@@ -201,7 +198,7 @@ class promise:
                 if self.on_error is None and propagate:
                     if tb is None and (exc is None or exc is current_exc):
                         raise
-                    reraise(type(exc), exc, tb)
+                    raise exc.with_traceback(tb)
 
     @property
     def listeners(self):

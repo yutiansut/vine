@@ -8,11 +8,11 @@ from .case import Case
 class CanThen:
 
     def then(self, x, y):
-        pass
+        ...
 
 
 class CannotThen:
-    pass
+    ...
 
 
 class test_Thenable(Case):
