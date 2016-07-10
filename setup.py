@@ -15,8 +15,8 @@ import re
 import sys
 import codecs
 
-if sys.version_info < (2, 7):
-    raise Exception('vine requires Python 2.7 or higher.')
+if sys.version_info < (3, 6):
+    raise Exception('vine 2.x requires Python 3.6 or higher.')
 
 NAME = 'vine'
 entrypoints = {}
@@ -27,10 +27,8 @@ extra = {}
 classes = """
     Development Status :: 5 - Production/Stable
     Programming Language :: Python
-    Programming Language :: Python :: 2
-    Programming Language :: Python :: 2.7
     Programming Language :: Python :: 3
-    Programming Language :: Python :: 3.4
+    Programming Language :: Python :: 3.6
     License :: OSI Approved :: BSD License
     Intended Audience :: Developers
     Operating System :: OS Independent
