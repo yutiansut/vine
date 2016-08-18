@@ -13,10 +13,6 @@
 .. |coverage| image:: https://codecov.io/github/celery/vine/coverage.svg?branch=master
     :target: https://codecov.io/github/celery/vine?branch=master
 
-.. |bitdeli| image:: https://d2weczhvl823v0.cloudfront.net/celery/vine/trend.png
-    :alt: Bitdeli badge
-    :target: https://bitdeli.com/free
-
 .. |license| image:: https://img.shields.io/pypi/l/vine.svg
     :alt: BSD License
     :target: https://opensource.org/licenses/BSD-3-Clause
