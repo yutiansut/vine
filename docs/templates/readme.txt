@@ -2,7 +2,7 @@
  vine - Python Promises
 =====================================================================
 
-|build-status| |coverage| |bitdeli|
+|build-status| |coverage| |license| |wheel| |pyversion| |pyimp|
 
 .. include:: ../includes/introduction.txt
 
@@ -16,3 +16,19 @@
 .. |bitdeli| image:: https://d2weczhvl823v0.cloudfront.net/celery/vine/trend.png
     :alt: Bitdeli badge
     :target: https://bitdeli.com/free
+
+.. |license| image:: https://img.shields.io/pypi/l/vine.svg
+    :alt: BSD License
+    :target: https://opensource.org/licenses/BSD-3-Clause
+
+.. |wheel| image:: https://img.shields.io/pypi/wheel/vine.svg
+    :alt: Vine can be installed via wheel
+    :target: http://pypi.python.org/pypi/vine/
+
+.. |pyversion| image:: https://img.shields.io/pypi/pyversions/vine.svg
+    :alt: Supported Python versions.
+    :target: http://pypi.python.org/pypi/vine/
+
+.. |pyimp| image:: https://img.shields.io/pypi/implementation/vine.svg
+    :alt: Support Python implementations.
+    :target: http://pypi.python.org/pypi/vine/
