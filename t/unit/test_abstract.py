@@ -3,8 +3,6 @@ from __future__ import absolute_import, unicode_literals
 from vine.abstract import Thenable
 from vine.promises import promise
 
-from .case import Case
-
 
 class CanThen(object):
 
@@ -16,11 +14,11 @@ class CannotThen(object):
     pass
 
 
-class test_Thenable(Case):
+class test_Thenable:
 
     def test_isa(self):
-        self.assertIsInstance(CanThen(), Thenable)
-        self.assertNotIsInstance(CannotThen(), Thenable)
+        assert isinstance(CanThen(), Thenable)
+        assert not isinstance(CannotThen(), Thenable)
 
     def test_promise(self):
-        self.assertIsInstance(promise(lambda x: x), Thenable)
+        assert isinstance(promise(lambda x: x), Thenable)

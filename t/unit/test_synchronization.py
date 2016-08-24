@@ -1,12 +1,14 @@
 from __future__ import absolute_import, unicode_literals
 
+import pytest
+
+from case import Mock
+
 from vine.promises import promise
 from vine.synchronization import barrier
 
-from .case import Case, Mock
 
-
-class test_barrier(Case):
+class test_barrier:
 
     def setup(self):
         self.m1, self.m2, self.m3 = Mock(), Mock(), Mock()
@@ -15,18 +17,18 @@ class test_barrier(Case):
     def test_evaluate(self):
         x = barrier(self.ps)
         x()
-        self.assertFalse(x.ready)
+        assert not x.ready
         x()
-        self.assertFalse(x.ready)
+        assert not x.ready
         x.add(promise())
         x()
-        self.assertFalse(x.ready)
+        assert not x.ready
         x()
-        self.assertTrue(x.ready)
+        assert x.ready
         x()
         x()
 
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             x.add(promise())
 
     def test_reverse(self):
@@ -34,7 +36,7 @@ class test_barrier(Case):
         x = barrier(self.ps, callback=promise(callback))
         for p in self.ps:
             p()
-        self.assertTrue(x.ready)
+        assert x.ready
         callback.assert_called_with()
 
     def test_cancel(self):
@@ -44,9 +46,9 @@ class test_barrier(Case):
             p()
         x.add(promise())
         x.throw(KeyError())
-        self.assertFalse(x.ready)
+        assert not x.ready
 
     def test_throw(self):
         x = barrier(self.ps)
-        with self.assertRaises(KeyError):
+        with pytest.raises(KeyError):
             x.throw(KeyError(10))

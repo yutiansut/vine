@@ -1,26 +1,17 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-try:
-    from setuptools import setup, find_packages
-    from setuptools.command.test import test
-except ImportError:
-    raise
-    from ez_setup import use_setuptools
-    use_setuptools()
-    from setuptools import setup, find_packages           # noqa
-    from setuptools.command.test import test              # noqa
-
 import os
 import re
 import sys
 import codecs
 
+import setuptools
+import setuptools.command.test
+
 if sys.version_info < (2, 7):
     raise Exception('vine requires Python 2.7 or higher.')
 
 NAME = 'vine'
-entrypoints = {}
-extra = {}
 
 # -*- Classifiers -*-
 
@@ -80,12 +71,6 @@ def reqs(f):
     return filter(None, [strip_comments(l) for l in open(
         os.path.join(os.getcwd(), 'requirements', f)).readlines()])
 
-install_requires = []
-
-# -*- Tests Requires -*-
-
-tests_require = reqs('test.txt')
-
 # -*- Long Description -*-
 
 if os.path.exists('README.rst'):
@@ -97,21 +82,32 @@ else:
 
 # -*- %%% -*-
 
-setup(
+class pytest(setuptools.command.test.test):
+    user_options = [('pytest-args=', 'a', 'Arguments to pass to py.test')]
+
+    def initialize_options(self):
+        setuptools.command.test.test.initialize_options(self)
+        self.pytest_args = []
+
+    def run_tests(self):
+        import pytest
+        sys.exit(pytest.main(self.pytest_args))
+
+setuptools.setup(
     name=NAME,
+    packages=setuptools.find_packages(exclude=['t', 't.*']),
     version=meta['version'],
     description=meta['doc'],
+    long_description=long_description,
     author=meta['author'],
     author_email=meta['contact'],
     url=meta['homepage'],
     platforms=['any'],
-    license='BSD',
-    packages=find_packages(exclude=['ez_setup', 'tests', 'tests.*']),
-    zip_safe=False,
-    install_requires=install_requires,
-    tests_require=tests_require,
-    test_suite='nose.collector',
     classifiers=classifiers,
-    entry_points=entrypoints,
-    long_description=long_description,
-    **extra)
+    license='BSD',
+    install_requires=[],
+    tests_require=reqs('test.txt'),
+    cmdclass={'test': pytest},
+    zip_safe=False,
+    include_package_data=False,
+)

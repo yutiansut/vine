@@ -1,18 +1,19 @@
 from __future__ import absolute_import, unicode_literals
 
+import pytest
+import sys
 import traceback
+
 from collections import deque
 from struct import pack, unpack
 
-import sys
+from case import Mock
 
 from vine.funtools import wrap
 from vine.promises import promise
 
-from .case import Case, Mock
 
-
-class test_promise(Case):
+class test_promise:
 
     def test_example(self):
 
@@ -49,8 +50,8 @@ class test_promise(Case):
             else:
                 callback('Hello world')
 
-        self.assertTrue(proto.buffer)
-        self.assertEqual(proto.buffer[0], 'Hello world')
+        assert proto.buffer
+        assert proto.buffer[0] == 'Hello world'
 
     def test_signal(self):
         callback = Mock(name='callback')
@@ -79,7 +80,7 @@ class test_promise(Case):
         p.then(adder).then(power).then(final)
 
         p(42, 42)
-        self.assertEqual(p.value, ((42, 42), {}))
+        assert p.value == ((42, 42), {})
         adder.assert_called_with(42, 42)
         power.assert_called_with(84)
         final.assert_called_with(7056)
@@ -87,10 +88,10 @@ class test_promise(Case):
     def test_shallow_filter(self):
         a, b = promise(Mock(name='a')), promise(Mock(name='b'))
         p = promise(a, callback=b)
-        self.assertIsNotNone(p._svpending)
-        self.assertIsNone(p._lvpending)
+        assert p._svpending is not None
+        assert p._lvpending is None
         p(30)
-        self.assertIsNone(p._svpending)
+        assert p._svpending is None
         a.fun.assert_called_with(30)
         b.fun.assert_called_with(a.fun.return_value)
 
@@ -108,11 +109,11 @@ class test_promise(Case):
         )
         p = promise(a)
         p.then(b1)
-        self.assertIsNone(p._lvpending)
-        self.assertIsNotNone(p._svpending)
+        assert p._lvpending is None
+        assert p._svpending is not None
         p.then(b2)
-        self.assertIsNotNone(p._lvpending)
-        self.assertIsNone(p._svpending)
+        assert p._lvpending is not None
+        assert p._svpending is None
         p.then(b3)
 
         p(42)
@@ -138,8 +139,8 @@ class test_promise(Case):
         d.fun.assert_called_with(c.fun.return_value)
 
     def test_repr(self):
-        self.assertTrue(repr(promise()))
-        self.assertTrue(repr(promise(Mock())))
+        assert repr(promise())
+        assert repr(promise(Mock()))
 
     def test_cancel(self):
         on_error = promise(Mock(name='on_error'))
@@ -155,15 +156,15 @@ class test_promise(Case):
 
         p.cancel()
         p(42)
-        self.assertTrue(p.cancelled)
-        self.assertTrue(a.cancelled)
-        self.assertTrue(a2.cancelled)
-        self.assertTrue(b.cancelled)
-        self.assertTrue(c.cancelled)
-        self.assertTrue(on_error.cancelled)
+        assert p.cancelled
+        assert a.cancelled
+        assert a2.cancelled
+        assert b.cancelled
+        assert c.cancelled
+        assert on_error.cancelled
         d = promise(Mock(name='d'))
         p.then(d)
-        self.assertTrue(d.cancelled)
+        assert d.cancelled
 
     def test_svpending_raises(self):
         p = promise()
@@ -219,8 +220,8 @@ class test_promise(Case):
         a = promise(Mock(name='a'))
         p.then(a)
         p.cancel()
-        self.assertTrue(p.cancelled)
-        self.assertTrue(a.cancelled)
+        assert p.cancelled
+        assert a.cancelled
 
         p.throw(KeyError())
         p.throw1(KeyError())
@@ -228,18 +229,18 @@ class test_promise(Case):
     def test_cancel_no_cb(self):
         p = promise()
         p.cancel()
-        self.assertTrue(p.cancelled)
-        self.assertEqual(p.on_error, None)
+        assert p.cancelled
+        assert p.on_error is None
         p.throw(KeyError())
 
     def test_throw_no_exc(self):
         p = promise()
-        with self.assertRaises((TypeError, RuntimeError)):
+        with pytest.raises((TypeError, RuntimeError)):
             p.throw()
 
     def test_throw_no_excinfo(self):
         p = promise()
-        with self.assertRaises(KeyError):
+        with pytest.raises(KeyError):
             p.throw(KeyError())
 
     def test_throw_with_tb(self):
@@ -255,9 +256,9 @@ class test_promise(Case):
                 p.throw()
             except KeyError:
                 err = traceback.format_exc()
-                self.assertIn("in foo\n    raise KeyError()", err)
+                assert 'in foo\n    raise KeyError()' in err
             else:
-                raise AssertionError("Did not throw.")
+                raise AssertionError('Did not throw.')
 
     def test_throw_with_other_tb(self):
         p = promise()
@@ -280,23 +281,23 @@ class test_promise(Case):
                 p.throw(exc, tb)
             except KeyError:
                 err = traceback.format_exc()
-                self.assertIn("in bar\n    raise ValueError()", err)
+                assert 'in bar\n    raise ValueError()' in err
             else:
-                raise AssertionError("Did not throw.")
+                raise AssertionError('Did not throw.')
 
     def test_throw_None(self):
         try:
             raise KeyError()
         except Exception:
-            with self.assertRaises(KeyError):
+            with pytest.raises(KeyError):
                 promise().throw()
 
     def test_listeners(self):
         p = promise()
         p.then(Mock())
-        self.assertEqual(len(p.listeners), 1)
+        assert len(p.listeners) == 1
         p.then(Mock())
-        self.assertEqual(len(p.listeners), 2)
+        assert len(p.listeners) == 2
 
     def test_throw_from_cb(self):
         ae = promise(Mock(name='ae'))
@@ -309,13 +310,13 @@ class test_promise(Case):
         exc = a.side_effect = KeyError()
         p1 = promise(a, on_error=ae)
         p1.then(b)
-        self.assertTrue(p1._svpending)
+        assert p1._svpending
         p1(42)
         p1.on_error.fun.assert_called_with(exc)
 
         p2 = promise(a)
         p2.then(b).then(c)
-        with self.assertRaises(KeyError):
+        with pytest.raises(KeyError):
             p2(42)
 
         de = promise(Mock(name='de'))
