@@ -100,6 +100,7 @@ setuptools.setup(
     version=meta['version'],
     description=meta['doc'],
     long_description=long_description,
+    keywords='promise promises lazy future futures',
     author=meta['author'],
     author_email=meta['contact'],
     url=meta['homepage'],
