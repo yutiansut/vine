@@ -1,12 +1,8 @@
 # -*- coding: utf-8 -*-
-"""
-    vine.five
-    ~~~~~~~~~
+"""Python 2/3 compatibility.
 
-    Compatibility implementations of features
-    only available in newer Python versions.
-
-
+Compatibility implementations of features
+only available in newer Python versions.
 """
 from __future__ import absolute_import, unicode_literals
 
@@ -20,6 +16,7 @@ except ImportError:  # pragma: no cover
     from collections import defaultdict
 
     def Counter():  # noqa
+        """Create counter."""
         return defaultdict(int)
 
 try:
@@ -28,7 +25,7 @@ except NameError:  # pragma: no cover
     # Py3 does not have buffer, only use this for isa checks.
 
     class buffer_t(object):  # noqa
-        pass
+        """Python 3 does not have a buffer type."""
 
 bytes_t = bytes
 
@@ -151,23 +148,29 @@ if PY3:  # pragma: no cover
     module_name_t = str
 
     def bytes_if_py2(s):
+        """Convert str to bytes if running under Python 2."""
         return s
 
     def items(d):
+        """Get dict items iterator."""
         return d.items()
 
     def keys(d):
+        """Get dict keys iterator."""
         return d.keys()
 
     def values(d):
+        """Get dict values iterator."""
         return d.values()
 
     def nextfun(it):
+        """Get iterator next method."""
         return it.__next__
 
     exec_ = getattr(builtins, 'exec')
 
     def reraise(tp, value, tb=None):
+        """Reraise exception."""
         if value.__traceback__ is not tb:
             raise value.with_traceback(tb)
         raise value
@@ -191,25 +194,31 @@ else:
     int_types = (int, long)
 
     def array(typecode, *args, **kwargs):
+        """Create array."""
         if isinstance(typecode, unicode):
             typecode = typecode.encode()
         return _array(typecode, *args, **kwargs)
 
     def bytes_if_py2(s):
+        """Convert str to bytes if running under Python 2."""
         if isinstance(s, unicode):
             return s.encode()
         return s
 
     def items(d):                   # noqa
+        """Return dict items iterator."""
         return d.iteritems()
 
     def keys(d):                    # noqa
+        """Return dict key iterator."""
         return d.iterkeys()
 
     def values(d):                  # noqa
+        """Return dict values iterator."""
         return d.itervalues()
 
     def nextfun(it):                # noqa
+        """Return iterator next method."""
         return it.next
 
     def exec_(code, globs=None, locs=None):  # pragma: no cover
@@ -235,7 +244,6 @@ def with_metaclass(Type, skip_attrs={'__dict__', '__weakref__'}):
     (that is -- it copies the original class instead of using inheritance).
 
     """
-
     def _clone_with_metaclass(Class):
         attrs = {key: value for key, value in items(vars(Class))
                  if key not in skip_attrs}
@@ -253,9 +261,11 @@ except ImportError:
 
 if sys.version_info >= (2, 7):  # pragma: no cover
     def format_d(i):
+        """Format number."""
         return format(i, ',d')
 else:  # pragma: no cover
     def format_d(i):  # noqa
+        """Format number."""
         s = '%d' % i
         groups = []
         while s and s[-1].isdigit():
@@ -269,6 +279,7 @@ _SIO_init = StringIO.__init__
 
 
 class WhateverIO(StringIO):
+    """StringIO that takes bytes or str."""
 
     def __init__(self, v=None, *a, **kw):
         _SIO_init(self, v.decode() if isinstance(v, bytes) else v, *a, **kw)
@@ -278,12 +289,16 @@ class WhateverIO(StringIO):
 
 
 def python_2_unicode_compatible(cls):
+    """Class decorator to ensure class is compatible with Python 2."""
     return python_2_non_unicode_str(python_2_non_unicode_repr(cls))
 
 
 def python_2_non_unicode_repr(cls):
-    """A class decorator that ensures ``__repr__`` returns non-unicode
-    when running under Python 2."""
+    """Ensure cls.__repr__ returns unicode.
+
+    A class decorator that ensures ``__repr__`` returns non-unicode
+    when running under Python 2.
+    """
     if PY2:
         try:
             cls.__dict__['__repr__']
@@ -298,12 +313,13 @@ def python_2_non_unicode_repr(cls):
 
 
 def python_2_non_unicode_str(cls):
-    """A class decorator that defines ``__unicode__`` and ``__str__`` methods
+    """Python 2 class string compatibility.
+
+    A class decorator that defines ``__unicode__`` and ``__str__`` methods
     under Python 2.  Under Python 3 it does nothing.
 
     To support Python 2 and 3 with a single code base, define a ``__str__``
     method returning text and apply this decorator to the class.
-
     """
     if PY2:
         try:
@@ -330,5 +346,6 @@ except ImportError:  # Py2
     ))
 
     def getfullargspec(fun, _fill=(None, ) * 3):  # noqa
+        """For compatibility with Python 3."""
         s = _getargspec(fun)
         return FullArgSpec(*s + _fill)

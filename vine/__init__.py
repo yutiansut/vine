@@ -1,4 +1,4 @@
-"""Promises, promises, promises"""
+"""Promises, promises, promises."""
 from __future__ import absolute_import, unicode_literals
 
 import re

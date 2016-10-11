@@ -1,3 +1,4 @@
+"""Synchronization primitives."""
 from __future__ import absolute_import, unicode_literals
 
 from .abstract import Thenable
@@ -7,7 +8,9 @@ __all__ = ['barrier']
 
 
 class barrier(object):
-    """Synchronization primitive to call a callback after a list
+    """Barrier.
+
+    Synchronization primitive to call a callback after a list
     of promises have been fulfilled.
 
     Example:
@@ -30,8 +33,8 @@ class barrier(object):
 
     Note that you cannot add new promises to a barrier after
     the barrier is fulfilled.
-
     """
+
     def __init__(self, promises=None, args=None, kwargs=None,
                  callback=None, size=None):
         self.p = promise()

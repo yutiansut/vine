@@ -1,3 +1,4 @@
+"""Promise implementation."""
 from __future__ import absolute_import, unicode_literals
 
 import sys
@@ -13,7 +14,7 @@ __all__ = ['promise']
 @Thenable.register
 @python_2_unicode_compatible
 class promise(object):
-    """Future evaluation.
+    """Promise of future evaluation.
 
     This is a special implementation of promises in that it can
     be used both for "promise of a value" and lazy evaluation.
@@ -73,8 +74,8 @@ class promise(object):
 
             def prepare_body(self, value):
                 self.buffer.append(value)
-
     """
+
     if not hasattr(sys, 'pypy_version_info'):  # pragma: no cover
         __slots__ = (
             'fun', 'args', 'kwargs', 'ready', 'failed',

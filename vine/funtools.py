@@ -1,3 +1,4 @@
+"""Functional utilities."""
 from __future__ import absolute_import, unicode_literals
 
 from .abstract import Thenable
@@ -11,6 +12,7 @@ __all__ = [
 
 
 def maybe_promise(p):
+    """Return None if p is unefined, otherwise make sure it's a promise."""
     if p:
         if not isinstance(p, Thenable):
             return promise(p)
@@ -18,12 +20,17 @@ def maybe_promise(p):
 
 
 def ensure_promise(p):
+    """Ensure p is a promise.
+
+    If p is not a promise, a new promise is created with p' as callback.
+    """
     if p is None:
         return promise()
     return maybe_promise(p)
 
 
 def ppartial(p, *args, **kwargs):
+    """Create/modify promise with partial arguments."""
     p = ensure_promise(p)
     if args:
         p.args = args + p.args
@@ -33,19 +40,26 @@ def ppartial(p, *args, **kwargs):
 
 
 def preplace(p, *args, **kwargs):
+    """Replace promise arguments.
 
+    This will force the promise to disregard any arguments
+    the promise is fulfilled with, and to be called with the
+    provided arguments instead.
+    """
     def _replacer(*_, **__):
         return p(*args, **kwargs)
     return promise(_replacer)
 
 
 def ready_promise(callback=None, *args):
+    """Create promise that is already fulfilled."""
     p = ensure_promise(callback)
     p(*args)
     return p
 
 
 def starpromise(fun, *args, **kwargs):
+    """Create promise, using star arguments."""
     return promise(fun, args, kwargs)
 
 
@@ -87,9 +101,11 @@ def _transback(filter_, callback, args, kwargs, ret):
 
 
 def wrap(p):
-    """Wrap promise so that if the promise is called with a promise as
-    argument, we attach ourselves to that promise instead."""
+    """Wrap promise.
 
+    This wraps the promise such that if the promise is called with a promise as
+    argument, we attach ourselves to that promise instead.
+    """
     def on_call(*args, **kwargs):
         if len(args) == 1 and isinstance(args[0], promise):
             return args[0].then(p)
