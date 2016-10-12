@@ -4,6 +4,7 @@ from __future__ import absolute_import, unicode_literals
 import sys
 
 from collections import deque
+from weakref import ref
 
 from .abstract import Thenable
 from .five import python_2_unicode_compatible, reraise
@@ -80,12 +81,13 @@ class promise(object):
         __slots__ = (
             'fun', 'args', 'kwargs', 'ready', 'failed',
             'value', 'reason', '_svpending', '_lvpending',
-            'on_error', 'cancelled',
+            'on_error', 'cancelled', 'weak', '__weakref__',
         )
 
     def __init__(self, fun=None, args=None, kwargs=None,
-                 callback=None, on_error=None):
-        self.fun = fun
+                 callback=None, on_error=None, weak=False):
+        self.weak = weak
+        self.fun = ref(fun) if self.weak else fun
         self.args = args or ()
         self.kwargs = kwargs or {}
         self.ready = False
@@ -101,7 +103,7 @@ class promise(object):
             self.then(callback)
 
         if self.fun:
-            assert callable(fun)
+            assert self.fun and callable(fun)
 
     def __repr__(self):
         return ('<{0} --> {1!r}>' if self.fun else '<{0}>').format(
@@ -127,9 +129,11 @@ class promise(object):
             return
         final_args = self.args + args if args else self.args
         final_kwargs = dict(self.kwargs, **kwargs) if kwargs else self.kwargs
-        if self.fun:
+        # self.fun may be a weakref
+        fun = self._fun_is_alive(self.fun)
+        if fun is not None:
             try:
-                retval = self.fun(*final_args, **final_kwargs)
+                retval = fun(*final_args, **final_kwargs)
                 self.value = (ca, ck) = (retval,), {}
             except Exception:
                 return self.throw()
@@ -151,6 +155,9 @@ class promise(object):
             finally:
                 self._lvpending = None
         return retval
+
+    def _fun_is_alive(self, fun):
+        return fun() if self.weak else self.fun
 
     def then(self, callback, on_error=None):
         if not isinstance(callback, Thenable):
