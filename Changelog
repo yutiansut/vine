@@ -1,6 +1,15 @@
 Changes
 =======
 
+.. _version-1.3.3:
+
+1.1.3
+=====
+:release-date: 2016-10-13 06:02 P.M PDT
+:release-by: Ask Solem
+
+- New ``promise(fun, weak=True)`` argument, creates weakref to callback.
+
 .. _version-1.1.2:
 
 1.1.2
