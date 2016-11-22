@@ -251,6 +251,7 @@ def with_metaclass(Type, skip_attrs={'__dict__', '__weakref__'}):
 
     return _clone_with_metaclass
 
+
 # ############# threading.TIMEOUT_MAX ########################################
 try:
     from threading import TIMEOUT_MAX as THREAD_TIMEOUT_MAX

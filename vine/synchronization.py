@@ -93,4 +93,4 @@ class barrier(object):
         if not self.cancelled:
             self.p.throw(*args, **kwargs)
     throw1 = throw
-Thenable.register(barrier)
+Thenable.register(barrier)  # noqa: E305
