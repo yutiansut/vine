@@ -1,5 +1,5 @@
-from typing import Dict, Optional, Sequence, Tuple
-
+"""Synchronization primitives."""
+from typing import Dict, Sequence, Tuple
 from .promises import promise
 from .types import PromiseArg, Thenable, ThenableProxy
 
@@ -8,7 +8,9 @@ __all__ = ['barrier']
 
 @Thenable.register
 class barrier(ThenableProxy):
-    """Synchronization primitive to call a callback after a list
+    """Barrier.
+
+    Synchronization primitive to call a callback after a list
     of promises have been fulfilled.
 
     Example:
@@ -33,11 +35,12 @@ class barrier(ThenableProxy):
     the barrier is fulfilled.
     """
 
-    def __init__(self, promises: Optional[Sequence[Thenable]] = None,
-                 args: Optional[Tuple] = None,
-                 kwargs: Optional[Dict] = None,
-                 callback: Optional[PromiseArg] = None,
-                 size: Optional[int] = None) -> None:
+    def __init__(self,
+                 promises: Sequence[Thenable] = None,
+                 args: Tuple = None,
+                 kwargs: Dict = None,
+                 callback: PromiseArg = None,
+                 size: int = None) -> None:
         self._set_promise_target(promise())
         self.args = args or ()      # type: Tuple
         self.kwargs = kwargs or {}  # type: Dict
@@ -47,6 +50,7 @@ class barrier(ThenableProxy):
         self.failed = False         # type: bool
         self.cancelled = False      # type: bool
         self.finalized = False      # type: bool
+
         if not self.size and promises:
             # iter(l) calls len(l) so generator wrappers
             # can only return NotImplemented in the case the
@@ -54,7 +58,6 @@ class barrier(ThenableProxy):
             plen = promises.__len__()
             if plen is not NotImplemented:
                 self.size = plen
-
         if promises:
             self.extend_noincr(promises)
         self.finalized = bool(promises or self.size)

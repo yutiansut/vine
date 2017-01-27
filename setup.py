@@ -1,19 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from setuptools import setup, find_packages
-
 import re
 import sys
 import codecs
-
+import setuptools
+import setuptools.command.test
 if sys.version_info < (3, 6):
     raise Exception('vine 2.x requires Python 3.6 or higher.')
-
 from pathlib import Path  # noqa
 
 NAME = 'vine'
-entrypoints = {}
-extra = {}
 
 # -*- Classifiers -*-
 
@@ -41,6 +37,7 @@ def add_default(m):
 
 def add_doc(m):
     return (('doc', m.groups()[0]),)
+
 
 pats = {re_meta: add_default,
         re_doc: add_doc}
@@ -71,13 +68,8 @@ def reqs(f):
     return list(filter(None, [strip_comments(l) for l in open(
         Path.cwd() / 'requirements' / f).readlines()]))
 
-install_requires = []
-
-# -*- Tests Requires -*-
-
-tests_require = reqs('test.txt')
-
 # -*- Long Description -*-
+
 
 if Path('README.rst').exists():
     long_description = codecs.open('README.rst', 'r', 'utf-8').read()
@@ -88,21 +80,35 @@ else:
 
 # -*- %%% -*-
 
-setup(
+
+class pytest(setuptools.command.test.test):
+    user_options = [('pytest-args=', 'a', 'Arguments to pass to py.test')]
+
+    def initialize_options(self):
+        setuptools.command.test.test.initialize_options(self)
+        self.pytest_args = []
+
+    def run_tests(self):
+        import pytest
+        sys.exit(pytest.main(self.pytest_args))
+
+
+setuptools.setup(
     name=NAME,
+    packages=setuptools.find_packages(exclude=['t', 't.*']),
     version=meta['version'],
     description=meta['doc'],
+    long_description=long_description,
+    keywords='promise promises lazy future futures',
     author=meta['author'],
     author_email=meta['contact'],
     url=meta['homepage'],
     platforms=['any'],
-    license='BSD',
-    packages=find_packages(exclude=['ez_setup', 'tests', 'tests.*']),
-    zip_safe=False,
-    install_requires=install_requires,
-    tests_require=tests_require,
-    test_suite='nose.collector',
     classifiers=classifiers,
-    entry_points=entrypoints,
-    long_description=long_description,
-    **extra)
+    license='BSD',
+    install_requires=[],
+    tests_require=reqs('test.txt'),
+    cmdclass={'test': pytest},
+    zip_safe=False,
+    include_package_data=False,
+)

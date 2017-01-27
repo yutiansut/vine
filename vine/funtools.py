@@ -1,5 +1,5 @@
+"""Functional utilities."""
 from typing import Any, Callable, Dict, Optional, Tuple, cast
-
 from .promises import promise
 from .types import Thenable
 
@@ -11,19 +11,26 @@ __all__ = [
 
 
 def maybe_promise(p: Optional[Callable]) -> Optional[Thenable]:
-    p = cast(Thenable, p)
-    if p and not isinstance(p, Thenable):
+    """Return None if p is undefined, otherwise make sure it's a promise."""
+    if p:
+        if isinstance(p, Thenable):
+            return cast(Thenable, p)
         return promise(p)
     return p
 
 
 def ensure_promise(p: Optional[Callable]) -> Thenable:
+    """Ensure p is a promise.
+
+    If p is not a promise, a new promise is created with p' as callback.
+    """
     if p is None:
         return promise()
     return cast(Thenable, maybe_promise(p))
 
 
 def ppartial(p: Optional[Callable], *args, **kwargs) -> Thenable:
+    """Create/modify promise with partial arguments."""
     _p = ensure_promise(p)
     if args:
         _p.args = args + _p.args
@@ -33,19 +40,27 @@ def ppartial(p: Optional[Callable], *args, **kwargs) -> Thenable:
 
 
 def preplace(p: Thenable, *args, **kwargs) -> Thenable:
+    """Replace promise arguments.
+
+    This will force the promise to disregard any arguments
+    the promise is fulfilled with, and to be called with the
+    provided arguments instead.
+    """
 
     def _replacer(*_, **__) -> Any:
         return p(*args, **kwargs)
     return promise(_replacer)
 
 
-def ready_promise(callback: Optional[Callable] = None, *args) -> Any:
+def ready_promise(callback: Callable = None, *args) -> Any:
+    """Create promise that is already fulfilled."""
     p = ensure_promise(callback)
     p(*args)
     return p
 
 
 def starpromise(fun: Callable, *args, **kwargs) -> Thenable:
+    """Create promise, using star arguments."""
     return promise(fun, args, kwargs)
 
 
@@ -89,8 +104,11 @@ def _transback(filter_: Callable, callback: Thenable,
 
 
 def wrap(p: Thenable):
-    """Wrap promise so that if the promise is called with a promise as
-    argument, we attach ourselves to that promise instead."""
+    """Wrap promise.
+
+    This wraps the promise such that if the promise is called with a promise as
+    argument, we attach ourselves to that promise instead.
+    """
 
     def on_call(*args, **kwargs) -> Any:
         if len(args) == 1 and isinstance(args[0], promise):

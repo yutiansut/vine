@@ -2,10 +2,10 @@
  vine - Python Promises
 =====================================================================
 
-|build-status| |coverage| |bitdeli|
+|build-status| |coverage| |license| |wheel| |pyversion| |pyimp|
 
-:Version: 1.1.1
-:Web: http://vine.readthedocs.org/
+:Version: 1.1.3
+:Web: https://vine.readthedocs.io/
 :Download: http://pypi.python.org/pypi/vine/
 :Source: http://github.com/celery/vine/
 :Keywords: promise, async, future
@@ -21,7 +21,19 @@ About
 .. |coverage| image:: https://codecov.io/github/celery/vine/coverage.svg?branch=master
     :target: https://codecov.io/github/celery/vine?branch=master
 
-.. |bitdeli| image:: https://d2weczhvl823v0.cloudfront.net/celery/vine/trend.png
-    :alt: Bitdeli badge
-    :target: https://bitdeli.com/free
+.. |license| image:: https://img.shields.io/pypi/l/vine.svg
+    :alt: BSD License
+    :target: https://opensource.org/licenses/BSD-3-Clause
+
+.. |wheel| image:: https://img.shields.io/pypi/wheel/vine.svg
+    :alt: Vine can be installed via wheel
+    :target: http://pypi.python.org/pypi/vine/
+
+.. |pyversion| image:: https://img.shields.io/pypi/pyversions/vine.svg
+    :alt: Supported Python versions.
+    :target: http://pypi.python.org/pypi/vine/
+
+.. |pyimp| image:: https://img.shields.io/pypi/implementation/vine.svg
+    :alt: Support Python implementations.
+    :target: http://pypi.python.org/pypi/vine/
 

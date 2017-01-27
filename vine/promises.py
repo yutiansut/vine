@@ -1,12 +1,10 @@
+"""Promise implementation."""
 import sys
-
 from collections import deque
 from reprlib import recursive_repr
 from types import TracebackType
-from typing import (
-    Any, Callable, Dict, MutableSequence, Optional, Sequence, cast,
-)
-
+from typing import Any, Callable, Dict, MutableSequence, Sequence, cast
+from weakref import ref
 from .types import Thenable
 
 __all__ = ['promise']
@@ -14,7 +12,7 @@ __all__ = ['promise']
 
 @Thenable.register
 class promise:
-    """Future evaluation.
+    """Promise of future evaluation.
 
     This is a special implementation of promises in that it can
     be used both for "promise of a value" and lazy evaluation.
@@ -74,27 +72,30 @@ class promise:
 
             def prepare_body(self, value):
                 self.buffer.append(value)
-
     """
+
     if not hasattr(sys, 'pypy_version_info'):  # pragma: no cover
-        __slots__ = (
+        __slots__ = (  # type: Tuple[str, ...]
             'fun', 'args', 'kwargs', 'ready', 'failed',
             'value', 'reason', '_svpending', '_lvpending',
-            'on_error', 'cancelled',
+            'on_error', 'cancelled', 'weak', '__weakref__',
         )
 
-    def __init__(self, fun: Optional[Callable] = None,
-                 args: Optional[Sequence] = None,
-                 kwargs: Optional[Dict] = None,
-                 callback: Optional[Callable] = None,
-                 on_error: Optional[Callable] = None) -> None:
-        self.fun = fun
+    def __init__(self,
+                 fun: Callable = None,
+                 args: Sequence = None,
+                 kwargs: Dict = None,
+                 callback: Callable = None,
+                 on_error: Callable = None,
+                 weak: bool = False) -> None:
+        self.weak = weak
+        self.fun = ref(fun) if self.weak else fun
         self.args = cast(Sequence, args or ())  # type: Sequence
         self.kwargs = kwargs or {}
         self.ready = False
         self.failed = False
         self.value = None        # type: Any
-        self.reason = None       # type: Optional[BaseException]
+        self.reason = None       # type: BaseException
         self._svpending = None   # type: Thenable
         self._lvpending = None   # type: deque[Thenable]
         self.on_error = cast(Thenable, on_error)
@@ -104,7 +105,7 @@ class promise:
             self.then(callback)
 
         if self.fun:
-            assert callable(fun)
+            assert self.fun and callable(fun)
 
     def cancel(self) -> None:
         self.cancelled = True
@@ -129,12 +130,11 @@ class promise:
                       else self.args)  # type: Sequence
         final_kwargs = (dict(self.kwargs, **kwargs) if kwargs
                         else self.kwargs)  # type: Dict
-        if self.fun:
+        fun = self._fun_is_alive(self.fun)
+        if fun is not None:
             try:
-                retval = self.fun(*final_args, **final_kwargs)
-                ca = (retval,)
-                ck = {}
-                self.value = (ca, ck)
+                retval = fun(*final_args, **final_kwargs)
+                self.value = (ca, ck) = (retval,), {}
             except Exception:
                 return self.throw()
             except BaseException:
@@ -163,8 +163,10 @@ class promise:
                 self._lvpending = None
         return retval
 
-    def then(self, callback: Callable,
-             on_error: Optional[Callable] = None) -> Thenable:
+    def _fun_is_alive(self, fun: Callable) -> Any:
+        return fun() if self.weak else self.fun
+
+    def then(self, callback: Callable, on_error: Callable = None) -> Thenable:
         p = cast(Thenable, callback)
         if isinstance(p, Thenable):
             p = promise(callback, on_error=on_error)
@@ -186,15 +188,15 @@ class promise:
         self._lvpending.append(p)
         return p
 
-    def throw1(self, exc: Optional[BaseException] = None) -> None:
+    def throw1(self, exc: BaseException = None) -> None:
         if not self.cancelled:
             exc = exc if exc is not None else sys.exc_info()[1]
             self.failed, self.reason = True, exc
             if self.on_error:
                 self.on_error(*self.args + (exc,), **self.kwargs)
 
-    def throw(self, exc: Optional[BaseException] = None,
-              tb: Optional[TracebackType] = None,
+    def throw(self, exc: BaseException = None,
+              tb: TracebackType = None,
               propagate: int = True) -> None:
         if not self.cancelled:
             current_exc = sys.exc_info()[1]
@@ -220,6 +222,7 @@ class promise:
                         raise
                     raise exc.with_traceback(tb)
 
+    @recursive_repr()
     def __repr__(self) -> str:
         return ('<{0} --> {1!r}>' if self.fun else '<{0}>').format(
             '{0}@0x{1:x}'.format(

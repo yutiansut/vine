@@ -1,12 +1,9 @@
 import abc
 import collections
-
-
 from types import TracebackType
 from typing import Any, Callable, Optional, TypeVar
 
 __all__ = ['PromiseArg', 'Thenable', 'ThenableProxy']
-
 
 PromiseArg = TypeVar('PromiseArg', Callable, 'Thenable')
 
@@ -19,17 +16,17 @@ class Thenable(collections.Callable):  # pragma: no cover
 
     @abc.abstractmethod
     def then(self, on_success: 'PromiseArg',
-             on_error: Optional['PromiseArg'] = None) -> 'Thenable':
+             on_error: 'PromiseArg' = None) -> 'Thenable':
         ...
 
     @abc.abstractmethod
-    def throw(self, exc: Optional[BaseException] = None,
-              tb: Optional[TracebackType] = None,
+    def throw(self, exc: BaseException = None,
+              tb: TracebackType = None,
               propagate: int = True) -> None:
         ...
 
     @abc.abstractmethod
-    def throw1(self, exc: Optional[BaseException] = None) -> None:
+    def throw1(self, exc: BaseException = None) -> None:
         ...
 
     @abc.abstractmethod
@@ -66,17 +63,17 @@ class ThenableProxy:
         self._p = p
 
     def then(self, on_success: PromiseArg,
-             on_error: Optional[PromiseArg] = None) -> Thenable:
+             on_error: PromiseArg = None) -> Thenable:
         return self._p.then(on_success, on_error)
 
     def cancel(self) -> None:
         self._p.cancel()
 
-    def throw1(self, exc: Optional[BaseException] = None) -> None:
+    def throw1(self, exc: BaseException = None) -> None:
         self._p.throw1(exc)
 
-    def throw(self, exc: Optional[BaseException] = None,
-              tb: Optional[TracebackType] = None,
+    def throw(self, exc: BaseException = None,
+              tb: TracebackType = None,
               propagate: int = True) -> None:
         self._p.throw(exc, tb=tb, propagate=propagate)
 

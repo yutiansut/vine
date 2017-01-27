@@ -1,9 +1,6 @@
-"""Promises, promises, promises"""
-
+"""Promises, promises, promises."""
 import re
-
 from typing import NamedTuple
-
 from .funtools import (
     maybe_promise, ensure_promise,
     ppartial, preplace, starpromise, transform, wrap,
@@ -12,10 +9,10 @@ from .promises import promise
 from .synchronization import barrier
 from .types import Thenable
 
-__version__ = '1.1.1'
+__version__ = '2.0.0a1'
 __author__ = 'Ask Solem'
 __contact__ = 'ask@celeryproject.org'
-__homepage__ = 'http://github.com/celery/vine',
+__homepage__ = 'http://github.com/celery/vine'
 __docformat__ = 'restructuredtext'
 
 # -eof meta-
