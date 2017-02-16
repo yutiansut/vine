@@ -1,10 +1,7 @@
 from __future__ import absolute_import, unicode_literals
-
 import pytest
-
 from case import Mock
-
-from vine.abstract import Thenable
+from vine.types import Thenable
 from vine.funtools import (
     maybe_promise, ppartial, preplace,
     ready_promise, starpromise, transform, wrap,

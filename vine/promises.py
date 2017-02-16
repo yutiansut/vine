@@ -3,7 +3,9 @@ import sys
 from collections import deque
 from reprlib import recursive_repr
 from types import TracebackType
-from typing import Any, Callable, Dict, MutableSequence, Sequence, cast
+from typing import (
+    Any, Callable, Coroutine, Dict, MutableSequence, Sequence, cast,
+)
 from weakref import ref
 from .types import Thenable
 
@@ -119,6 +121,16 @@ class promise:
                 self.on_error.cancel()
         finally:
             self._svpending = self._lvpending = self.on_error = None
+
+    def __await__(self):
+        value = self()
+        return value.__await__()
+
+    async def maybe_await(self, *args, **kwargs):
+        value = self(*args, **kwargs)
+        if isinstance(value, Coroutine):
+            return await value
+        return value
 
     def __call__(self, *args, **kwargs) -> Any:
         if self.cancelled:

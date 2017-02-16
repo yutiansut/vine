@@ -1,7 +1,10 @@
 """Python compatiblity utilities."""
 # Python 3.6 sets wrapper.__wrapped__ now, so no longer
 # necessary to import wraps from this module.
-from functools import update_wrapper, wraps  # noqa
+from functools import (  # noqa
+    WRAPPER_ASSIGNMENTS, WRAPPER_UPDATES,
+    update_wrapper, wraps,
+)
 
 __all__ = ['update_wrapper', 'wraps']
 
