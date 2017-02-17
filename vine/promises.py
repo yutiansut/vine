@@ -94,6 +94,10 @@ class promise(object):
         self.failed = False
         self.value = None
         self.reason = None
+        # Optimization
+        # Most promises will only have one callback, so we optimize for this
+        # case by using a list only when there are multiple callbacks.
+        #   s(calar) pending / l(ist) pending
         self._svpending = None
         self._lvpending = None
         self.on_error = on_error
