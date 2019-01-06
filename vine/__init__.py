@@ -14,7 +14,7 @@ from .funtools import (
 )
 
 
-__version__ = '1.1.4'
+__version__ = '1.2.0'
 __author__ = 'Ask Solem'
 __contact__ = 'ask@celeryproject.org'
 __homepage__ = 'http://github.com/celery/vine'
