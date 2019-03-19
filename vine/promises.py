@@ -86,13 +86,15 @@ class promise(object):
     if not hasattr(sys, 'pypy_version_info'):  # pragma: no cover
         __slots__ = (
             'fun', 'args', 'kwargs', 'ready', 'failed',
-            'value', 'reason', '_svpending', '_lvpending',
+            'value', 'ignore_result', 'reason', '_svpending', '_lvpending',
             'on_error', 'cancelled', 'weak', '__weakref__',
         )
 
     def __init__(self, fun=None, args=None, kwargs=None,
-                 callback=None, on_error=None, weak=False):
+                 callback=None, on_error=None, weak=False,
+                 ignore_result=False):
         self.weak = weak
+        self.ignore_result = ignore_result
         self.fun = self._get_fun_or_weakref(fun=fun, weak=weak)
         self.args = args or ()
         self.kwargs = kwargs or {}
@@ -157,8 +159,13 @@ class promise(object):
         fun = self._fun_is_alive(self.fun)
         if fun is not None:
             try:
-                retval = fun(*final_args, **final_kwargs)
-                self.value = (ca, ck) = (retval,), {}
+                if self.ignore_result:
+                    fun(*final_args, **final_kwargs)
+                    ca = ()
+                    ck = {}
+                else:
+                    retval = fun(*final_args, **final_kwargs)
+                    self.value = (ca, ck) = (retval,), {}
             except Exception:
                 return self.throw()
         else:

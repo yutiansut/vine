@@ -59,7 +59,29 @@ class test_promise:
         a = promise()
         a.then(callback)
         a(42)
-        callback.assert_called_with(42)
+        callback.assert_called_once_with(42)
+
+    def test_signal_callback_kwargs(self):
+        callback = Mock(name='callback')
+        a = promise(callback=callback)
+        a(42)
+        callback.assert_called_once_with(42)
+
+    def test_call_ignore_result(self):
+        fun = Mock(name='fun')
+        callback = Mock(name='callback')
+        a = promise(fun=fun, ignore_result=True)
+        a.then(callback)
+        a()
+        fun.assert_called_once_with()
+        callback.assert_called_once_with()
+
+    def test_call_ignore_result_callback_kwarg(self):
+        fun = Mock(name='fun')
+        callback = Mock(name='callback')
+        a = promise(fun=fun, ignore_result=True, callback=callback)
+        a()
+        callback.assert_called_once_with()
 
     def test_chained(self):
 
