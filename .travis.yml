@@ -1,7 +1,10 @@
 dist: xenial
 language: python
-sudo: false
 cache: pip
+
+stages:
+  - lint
+  - test
 
 env:
   global:
@@ -24,10 +27,13 @@ matrix:
     - python: pypy3.5-6.0
       env: TOXENV=pypy3
     - env: TOXENV=flake8
+      stage: lint
     - env: TOXENV=flakeplus
+      stage: lint
     - env: TOXENV=apicheck
+      stage: lint
     - env: TOXENV=pydocstyle
-    - env: TOXENV=cov
+      stage: lint
 
 install:
     - pip install -U pip setuptools wheel | cat
