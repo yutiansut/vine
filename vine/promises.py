@@ -1,25 +1,17 @@
 """Promise implementation."""
-from __future__ import absolute_import, unicode_literals
-
 import sys
 
 from collections import deque
 import inspect
-from weakref import ref
-
-try:
-    from weakref import WeakMethod
-except ImportError:
-    from vine.backports.weakref_backports import WeakMethod
+from weakref import ref, WeakMethod
 
 from .abstract import Thenable
-from .five import python_2_unicode_compatible, reraise
+from .utils import reraise
 
 __all__ = ['promise']
 
 
 @Thenable.register
-@python_2_unicode_compatible
 class promise(object):
     """Promise of future evaluation.
 
@@ -32,7 +24,6 @@ class promise(object):
 
     .. code-block:: python
 
-        >>> from __future__ import print_statement  # noqa
         >>> p = promise()
         >>> p.then(promise(print, ('OK',)))  # noqa
         >>> p.on_error = promise(print, ('ERROR',))  # noqa
