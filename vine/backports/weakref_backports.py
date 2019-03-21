@@ -1,3 +1,5 @@
+# flake8: noqa
+
 """Weakref compatibility.
 
 weakref_backports is a partial backport of the weakref module for Python

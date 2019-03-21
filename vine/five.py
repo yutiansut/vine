@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# flake8: noqa
 """Python 2/3 compatibility.
 
 Compatibility implementations of features
