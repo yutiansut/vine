@@ -2,6 +2,9 @@ Changes
 =======
 
 .. _version-1.3.0:
+
+1.3.0
+=====
 :release-date: 2019-03-19 11:00 A.M UTC+2
 :release-by: Omer Katz
 
@@ -11,11 +14,11 @@ Changes
   Contributed by **Omer Katz**
 
 .. _version-1.2.0:
-:release-date: 2018-01-06 4:30 P.M UTC+2
-:release-by: Omer Katz
 
 1.2.0
 =====
+:release-date: 2018-01-06 4:30 P.M UTC+2
+:release-by: Omer Katz
 
 - Added Python 3.7 support.
 
